@@ -26,7 +26,7 @@ func main() {
 	// Add video resource
 	builder.AddVideo("A1", "ShortFormMusicalWorkVideo", "QZ6GL1732999").
 		WithTitle("Video display title", "Video subtitle").
-		WithArtist("John Doe", "PJohnDoe", 1).
+		WithArtist("John Doe", "PJohnDoe", "MainArtist", 1).
 		WithRightsController("PACME", 100.00).
 		WithDuration("PT3M10S").
 		WithCreationDate("2023-01-01", true).

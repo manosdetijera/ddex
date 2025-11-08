@@ -9,13 +9,13 @@ import (
 
 // Builder provides a fluent interface for creating DDEX ERN 4.3 messages
 type Builder struct {
-	message *NewReleaseMessage
+	Message *NewReleaseMessage
 }
 
 // NewDDEXBuilder creates a new builder for ERN 4.3 messages
 func NewDDEXBuilder() *Builder {
 	return &Builder{
-		message: &NewReleaseMessage{
+		Message: &NewReleaseMessage{
 			XmlnsErn:                XmlnsErn,
 			XmlnsXsi:                XmlnsXsi,
 			XsiSchemaLocation:       XsiSchemaLocation,
@@ -41,7 +41,7 @@ func (b *Builder) WithMessageHeader(messageId, threadId, senderDPID, senderName 
 		},
 	}
 
-	b.message.MessageHeader = &MessageHeader{
+	b.Message.MessageHeader = &MessageHeader{
 		MessageThreadId:        threadId,
 		MessageId:              messageId,
 		MessageSender:          sender,
@@ -53,8 +53,8 @@ func (b *Builder) WithMessageHeader(messageId, threadId, senderDPID, senderName 
 
 // AddRecipient adds a message recipient (e.g., YouTube)
 func (b *Builder) AddRecipient(dpid, name string) *Builder {
-	if b.message.MessageHeader == nil {
-		b.message.MessageHeader = &MessageHeader{}
+	if b.Message.MessageHeader == nil {
+		b.Message.MessageHeader = &MessageHeader{}
 	}
 
 	recipient := &MessageRecipient{
@@ -66,7 +66,7 @@ func (b *Builder) AddRecipient(dpid, name string) *Builder {
 		},
 	}
 
-	b.message.MessageHeader.MessageRecipient = append(b.message.MessageHeader.MessageRecipient, recipient)
+	b.Message.MessageHeader.MessageRecipient = append(b.Message.MessageHeader.MessageRecipient, recipient)
 	return b
 }
 
@@ -89,7 +89,7 @@ func (b *Builder) AddParty(reference, fullName, fullNameIndexed string) *Builder
 		party = *NewParty(reference, fullName)
 	}
 
-	b.message.PartyList.Party = append(b.message.PartyList.Party, party)
+	b.Message.PartyList.Party = append(b.Message.PartyList.Party, party)
 	return b
 }
 
@@ -108,12 +108,12 @@ func (b *Builder) AddVideo(resourceRef, videoType, isrc string) *VideoBuilder {
 		})
 	}
 
-	b.message.ResourceList.Video = append(b.message.ResourceList.Video, *video)
-	videoIndex := len(b.message.ResourceList.Video) - 1
+	b.Message.ResourceList.Video = append(b.Message.ResourceList.Video, *video)
+	videoIndex := len(b.Message.ResourceList.Video) - 1
 
 	return &VideoBuilder{
 		builder: b,
-		video:   &b.message.ResourceList.Video[videoIndex],
+		video:   &b.Message.ResourceList.Video[videoIndex],
 	}
 }
 
@@ -124,12 +124,12 @@ func (b *Builder) AddImage(resourceRef, imageType string) *ImageBuilder {
 		Type:              imageType,
 	}
 
-	b.message.ResourceList.Image = append(b.message.ResourceList.Image, *image)
-	imageIndex := len(b.message.ResourceList.Image) - 1
+	b.Message.ResourceList.Image = append(b.Message.ResourceList.Image, *image)
+	imageIndex := len(b.Message.ResourceList.Image) - 1
 
 	return &ImageBuilder{
 		builder: b,
-		image:   &b.message.ResourceList.Image[imageIndex],
+		image:   &b.Message.ResourceList.Image[imageIndex],
 	}
 }
 
@@ -146,12 +146,12 @@ func (b *Builder) AddRelease(releaseRef, releaseType, icpn string) *ReleaseBuild
 		}
 	}
 
-	b.message.ReleaseList.Release = append(b.message.ReleaseList.Release, *release)
-	releaseIndex := len(b.message.ReleaseList.Release) - 1
+	b.Message.ReleaseList.Release = append(b.Message.ReleaseList.Release, *release)
+	releaseIndex := len(b.Message.ReleaseList.Release) - 1
 
 	return &ReleaseBuilder{
 		builder: b,
-		release: &b.message.ReleaseList.Release[releaseIndex],
+		release: &b.Message.ReleaseList.Release[releaseIndex],
 	}
 }
 
@@ -162,24 +162,24 @@ func (b *Builder) AddDeal(releaseRef string) *DealBuilder {
 		Deal:                 []Deal{{}},
 	}
 
-	b.message.DealList.ReleaseDeal = append(b.message.DealList.ReleaseDeal, *deal)
-	dealIndex := len(b.message.DealList.ReleaseDeal) - 1
+	b.Message.DealList.ReleaseDeal = append(b.Message.DealList.ReleaseDeal, *deal)
+	dealIndex := len(b.Message.DealList.ReleaseDeal) - 1
 
 	return &DealBuilder{
 		builder:     b,
-		releaseDeal: &b.message.DealList.ReleaseDeal[dealIndex],
-		deal:        &b.message.DealList.ReleaseDeal[dealIndex].Deal[0],
+		releaseDeal: &b.Message.DealList.ReleaseDeal[dealIndex],
+		deal:        &b.Message.DealList.ReleaseDeal[dealIndex].Deal[0],
 	}
 }
 
 // Build returns the completed NewReleaseMessage
 func (b *Builder) Build() *NewReleaseMessage {
-	return b.message
+	return b.Message
 }
 
 // ToXML converts the message to XML bytes
 func (b *Builder) ToXML() ([]byte, error) {
-	return xml.MarshalIndent(b.message, "", "    ")
+	return xml.MarshalIndent(b.Message, "", "    ")
 }
 
 // WriteToFile writes the message to an XML file
@@ -226,13 +226,13 @@ func (vb *VideoBuilder) WithTitle(title, subtitle string) *VideoBuilder {
 }
 
 // WithArtist sets the video artist
-func (vb *VideoBuilder) WithArtist(artistName, partyRef string, sequence int) *VideoBuilder {
+func (vb *VideoBuilder) WithArtist(artistName, partyRef, role string, sequence int) *VideoBuilder {
 	vb.video.DisplayArtistName = []string{artistName}
 
 	if partyRef != "" {
 		vb.video.DisplayArtist = append(vb.video.DisplayArtist, DisplayArtist{
 			ArtistPartyReference: partyRef,
-			DisplayArtistRole:    "MainArtist",
+			DisplayArtistRole:    role,
 			SequenceNumber:       sequence,
 		})
 	}

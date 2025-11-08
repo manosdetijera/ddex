@@ -55,7 +55,7 @@ func main() {
     // Add video resource
     builder.AddVideo("A1", "ShortFormMusicalWorkVideo", "USXX12300001").
         WithTitle("My Video Title", "Subtitle").
-        WithArtist("Artist Name", "P1", 1).
+        WithArtist("Artist Name", "P1", "MainArtist", 1).
         WithDuration("PT3M30S").
         WithCreationDate("2024-01-01", false).
         WithParentalWarning("NoAdviceAvailable").
@@ -118,7 +118,7 @@ func main() {
     // Add video resource
     builder.AddVideo("A1", "ShortFormMusicalWorkVideo", "QZ6GL1732999").
         WithTitle("Video display title", "Video subtitle").
-        WithArtist("John Doe", "PJohnDoe", 1).
+        WithArtist("John Doe", "PJohnDoe", "MainArtist", 1).
         WithRightsController("PACME", 100.00).
         WithDuration("PT3M10S").
         WithCreationDate("2023-01-01", true).
@@ -219,7 +219,7 @@ builder.AddParty("P_LABEL", "ACME Records", "")
 ```go
 builder.AddVideo("A1", "ShortFormMusicalWorkVideo", "ISRC_CODE").
     WithTitle("Video Title", "Subtitle").
-    WithArtist("Artist Name", "PARTY_REF", 1).
+    WithArtist("Artist Name", "PARTY_REF", "MainArtist", 1).
     WithRightsController("LABEL_REF", 100.00).
     WithDuration("PT3M10S").                    // ISO 8601 duration
     WithCreationDate("2024-01-01", false).      // Date and isApproximate flag
