@@ -1,0 +1,88 @@
+package ddex
+
+import "encoding/xml"
+
+// ReleaseList lists all the Release composites
+type ReleaseList struct {
+	XMLName xml.Name  `xml:"ReleaseList"`
+	Release []Release `xml:"Release"`
+}
+
+// Release represents a single release
+type Release struct {
+	XMLName               xml.Name                `xml:"Release"`
+	ReleaseReference      string                  `xml:"ReleaseReference"`
+	ReleaseType           string                  `xml:"ReleaseType,omitempty"`
+	ReleaseId             []ReleaseId             `xml:"ReleaseId,omitempty"`
+	DisplayTitleText      []DisplayTitleText      `xml:"DisplayTitleText"`
+	DisplayTitle          []DisplayTitle          `xml:"DisplayTitle,omitempty"`
+	DisplayArtistName     []string                `xml:"DisplayArtistName,omitempty"`
+	DisplayArtist         []DisplayArtist         `xml:"DisplayArtist,omitempty"`
+	ReleaseLabelReference []ReleaseLabelReference `xml:"ReleaseLabelReference,omitempty"`
+	PLine                 []PLine                 `xml:"PLine,omitempty"`
+	CLine                 []CLine                 `xml:"CLine,omitempty"`
+	Duration              string                  `xml:"Duration,omitempty"`
+	Genre                 []Genre                 `xml:"Genre,omitempty"`
+	ParentalWarningType   string                  `xml:"ParentalWarningType,omitempty"`
+	RelatedResource       []RelatedResource       `xml:"RelatedResource,omitempty"`
+	ResourceGroup         []ResourceGroup         `xml:"ResourceGroup,omitempty"`
+}
+
+// RelatedResource represents a resource that is related to the release
+type RelatedResource struct {
+	XMLName                  xml.Name          `xml:"RelatedResource"`
+	ResourceRelationshipType string            `xml:"ResourceRelationshipType"`
+	ResourceId               RelatedResourceId `xml:"ResourceId"`
+}
+
+// RelatedResourceId represents the identifier for a related resource
+type RelatedResourceId struct {
+	XMLName xml.Name `xml:"ResourceId"`
+	ISRC    string   `xml:"ISRC,omitempty"`
+	ISNI    string   `xml:"ISNI,omitempty"`
+}
+
+// ReleaseId represents release identification (ICPN, GRid, UPC, EAN, etc.)
+type ReleaseId struct {
+	XMLName xml.Name `xml:"ReleaseId"`
+	ICPN    string   `xml:"ICPN,omitempty"`
+	GRid    string   `xml:"GRid,omitempty"`
+	UPC     string   `xml:"UPC,omitempty"`
+	EAN     string   `xml:"EAN,omitempty"`
+}
+
+// ReleaseLabelReference represents a reference to a label party
+type ReleaseLabelReference struct {
+	XMLName                 xml.Name `xml:"ReleaseLabelReference"`
+	Value                   string   `xml:",chardata"`
+	ApplicableTerritoryCode string   `xml:"ApplicableTerritoryCode,attr,omitempty"`
+}
+
+// ResourceGroup represents a grouping of resources within a release
+type ResourceGroup struct {
+	XMLName                  xml.Name                   `xml:"ResourceGroup"`
+	AdditionalTitle          AdditionalTitle            `xml:"AdditionalTitle,omitempty"`
+	SequenceNumber           int                        `xml:"SequenceNumber,omitempty"`
+	ResourceGroupContentItem []ResourceGroupContentItem `xml:"ResourceGroupContentItem"`
+}
+
+// AdditionalTitle represents additional title information
+type AdditionalTitle struct {
+	XMLName   xml.Name `xml:"AdditionalTitle"`
+	TitleText string   `xml:"TitleText"`
+}
+
+// ResourceGroupContentItem represents an item within a resource group
+type ResourceGroupContentItem struct {
+	XMLName                        xml.Name                         `xml:"ResourceGroupContentItem"`
+	SequenceNumber                 int                              `xml:"SequenceNumber,omitempty"`
+	ReleaseResourceReference       string                           `xml:"ReleaseResourceReference"`
+	LinkedReleaseResourceReference []LinkedReleaseResourceReference `xml:"LinkedReleaseResourceReference,omitempty"`
+}
+
+// LinkedReleaseResourceReference represents a linked resource reference (e.g., cover art)
+type LinkedReleaseResourceReference struct {
+	XMLName         xml.Name `xml:"LinkedReleaseResourceReference"`
+	LinkDescription string   `xml:"LinkDescription,attr,omitempty"`
+	Value           string   `xml:",chardata"`
+}

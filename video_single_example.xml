@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ern:NewReleaseMessage xmlns:ern="http://ddex.net/xml/ern/43" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://ddex.net/xml/ern/43 http://ddex.net/xml/ern/43/release-notification.xsd" ReleaseProfileVersionId="Video" LanguageAndScriptCode="en" AvsVersionId="3">
+    <MessageHeader>
+        <MessageThreadId>VideoSingleTest</MessageThreadId>
+        <MessageId>VideoSingleTest</MessageId>
+        <MessageSender>
+            <PartyId>Your DPID</PartyId>
+            <PartyName>
+                <FullName>Your party name</FullName>
+            </PartyName>
+        </MessageSender>
+        <MessageRecipient>
+            <PartyId>PADPIDA2013020802I</PartyId>
+            <PartyName>
+                <FullName>YouTube</FullName>
+            </PartyName>
+        </MessageRecipient>
+        <MessageCreatedDateTime>2025-11-08T15:49:57-06:00</MessageCreatedDateTime>
+    </MessageHeader>
+    <PartyList>
+        <Party>
+            <PartyReference>PJohnDoe</PartyReference>
+            <PartyName>
+                <FullName>John Doe</FullName>
+                <FullNameIndexed>Doe, John</FullNameIndexed>
+            </PartyName>
+        </Party>
+        <Party>
+            <PartyReference>PACME</PartyReference>
+            <PartyName>
+                <FullName>ACME music</FullName>
+            </PartyName>
+        </Party>
+    </PartyList>
+    <ResourceList>
+        <Video>
+            <ResourceReference>A1</ResourceReference>
+            <Type>ShortFormMusicalWorkVideo</Type>
+            <VideoEdition>
+                <ResourceId>
+                    <ISRC>QZ6GL1732999</ISRC>
+                </ResourceId>
+                <ResourceId>
+                    <ProprietaryId Namespace="YOUTUBE:CHANNEL_ID">UCQ0qe7vLz7uE_-sdtM9WB_w</ProprietaryId>
+                </ResourceId>
+                <PLine>
+                    <Year>2023</Year>
+                    <PLineText>(P) 2023 Some Pline text</PLineText>
+                </PLine>
+                <TechnicalDetails>
+                    <TechnicalResourceDetailsReference>T1</TechnicalResourceDetailsReference>
+                    <DeliveryFile>
+                        <Type>AudioVisualFile</Type>
+                        <File>
+                            <URI>vid.mpg</URI>
+                        </File>
+                    </DeliveryFile>
+                </TechnicalDetails>
+            </VideoEdition>
+            <DisplayTitleText ApplicableTerritoryCode="Worldwide" LanguageAndScriptCode="en" IsDefault="true">Video display title</DisplayTitleText>
+            <DisplayTitle>
+                <TitleText>Video display title</TitleText>
+                <TitleText TitleType="SubTitle">Video subtitle</TitleText>
+            </DisplayTitle>
+            <DisplayArtistName>John Doe</DisplayArtistName>
+            <DisplayArtist SequenceNumber="1">
+                <ArtistPartyReference>PJohnDoe</ArtistPartyReference>
+                <DisplayArtistRole>MainArtist</DisplayArtistRole>
+            </DisplayArtist>
+            <ResourceRightsController>
+                <RightsControllerPartyReference>PACME</RightsControllerPartyReference>
+                <RightsControlType>RightsController</RightsControlType>
+                <RightSharePercentage>100.00</RightSharePercentage>
+                <DelegatedUsageRights>
+                    <UseType>UserMakeAvailableUserProvided</UseType>
+                    <TerritoryOfRightsDelegation>Worldwide</TerritoryOfRightsDelegation>
+                </DelegatedUsageRights>
+            </ResourceRightsController>
+            <Duration>PT3M10S</Duration>
+            <CreationDate IsApproximate="true">2023-01-01</CreationDate>
+            <ParentalWarningType>NoAdviceAvailable</ParentalWarningType>
+        </Video>
+        <Image>
+            <ResourceReference>A2</ResourceReference>
+            <Type>VideoScreenCapture</Type>
+            <ResourceId>
+                <ProprietaryId Namespace="Your DPID">VidCapPID</ProprietaryId>
+            </ResourceId>
+            <ParentalWarningType>NotExplicit</ParentalWarningType>
+            <TechnicalDetails>
+                <TechnicalResourceDetailsReference>T3</TechnicalResourceDetailsReference>
+                <File>
+                    <URI>vidCap.jpg</URI>
+                </File>
+            </TechnicalDetails>
+        </Image>
+    </ResourceList>
+    <ReleaseList>
+        <Release>
+            <ReleaseReference>R0</ReleaseReference>
+            <ReleaseType>VideoSingle</ReleaseType>
+            <ReleaseId>
+                <ICPN>2023121700021</ICPN>
+            </ReleaseId>
+            <DisplayTitleText ApplicableTerritoryCode="Worldwide" LanguageAndScriptCode="en" IsDefault="true">Video display title</DisplayTitleText>
+            <DisplayTitle>
+                <TitleText>Video display title</TitleText>
+                <TitleText TitleType="SubTitle">Video</TitleText>
+            </DisplayTitle>
+            <DisplayArtistName>John Doe</DisplayArtistName>
+            <DisplayArtist SequenceNumber="1">
+                <ArtistPartyReference>PJohnDoe</ArtistPartyReference>
+                <DisplayArtistRole>MainArtist</DisplayArtistRole>
+            </DisplayArtist>
+            <ReleaseLabelReference ApplicableTerritoryCode="Worldwide">PACME</ReleaseLabelReference>
+            <PLine>
+                <Year>2023</Year>
+                <PLineText>(P) 2023 Some Pline text</PLineText>
+            </PLine>
+            <CLine>
+                <Year>2023</Year>
+                <CLineText>(C) 2023 Some CLine text</CLineText>
+            </CLine>
+            <Duration>PT6M36S</Duration>
+            <Genre ApplicableTerritoryCode="Worldwide">
+                <GenreText>Pop</GenreText>
+            </Genre>
+            <ParentalWarningType>NoAdviceAvailable</ParentalWarningType>
+            <RelatedResource>
+                <ResourceRelationshipType>HasContentFrom</ResourceRelationshipType>
+                <ResourceId>
+                    <ISRC>US1111111111</ISRC>
+                </ResourceId>
+            </RelatedResource>
+            <ResourceGroup>
+                <AdditionalTitle>
+                    <TitleText>Component 1</TitleText>
+                </AdditionalTitle>
+                <SequenceNumber>1</SequenceNumber>
+                <ResourceGroupContentItem>
+                    <SequenceNumber>1</SequenceNumber>
+                    <ReleaseResourceReference>A1</ReleaseResourceReference>
+                    <LinkedReleaseResourceReference LinkDescription="VideoScreenCapture">A2</LinkedReleaseResourceReference>
+                </ResourceGroupContentItem>
+            </ResourceGroup>
+        </Release>
+    </ReleaseList>
+    <DealList>
+        <ReleaseDeal>
+            <DealReleaseReference>R0</DealReleaseReference>
+            <Deal>
+                <DealTerms>
+                    <TerritoryCode>Worldwide</TerritoryCode>
+                    <ValidityPeriod>
+                        <StartDate>2023-12-01</StartDate>
+                    </ValidityPeriod>
+                    <CommercialModelType>SubscriptionModel</CommercialModelType>
+                    <CommercialModelType>AdvertisementSupportedModel</CommercialModelType>
+                    <UseType>NonInteractiveStream</UseType>
+                    <UseType>OnDemandStream</UseType>
+                    <UseType>Stream</UseType>
+                </DealTerms>
+            </Deal>
+        </ReleaseDeal>
+    </DealList>
+</ern:NewReleaseMessage>
