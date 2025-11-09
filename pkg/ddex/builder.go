@@ -437,11 +437,11 @@ func (rb *ReleaseBuilder) WithDisplayArtistName(artistName string) *ReleaseBuild
 }
 
 // WithArtist adds a display artist reference to the release
-func (rb *ReleaseBuilder) WithArtist(partyRef string, sequence int) *ReleaseBuilder {
+func (rb *ReleaseBuilder) WithArtist(partyRef, role string, sequence int) *ReleaseBuilder {
 	if partyRef != "" {
 		rb.release.DisplayArtist = append(rb.release.DisplayArtist, DisplayArtist{
 			ArtistPartyReference: partyRef,
-			DisplayArtistRole:    "MainArtist",
+			DisplayArtistRole:    role,
 			SequenceNumber:       sequence,
 		})
 	}
@@ -504,6 +504,47 @@ func (rb *ReleaseBuilder) WithGenreAndSubGenre(genreText, subGenre, territoryCod
 // WithParentalWarning sets the parental warning type
 func (rb *ReleaseBuilder) WithParentalWarning(warningType string) *ReleaseBuilder {
 	rb.release.ParentalWarningType = warningType
+	return rb
+}
+
+// WithMarketingComment adds a marketing comment to the release
+func (rb *ReleaseBuilder) WithMarketingComment(comment, territoryCode, languageCode string) *ReleaseBuilder {
+	commentEntry := MarketingComment{
+		Value:                   comment,
+		ApplicableTerritoryCode: territoryCode,
+		LanguageAndScriptCode:   languageCode,
+	}
+
+	rb.release.MarketingComment = append(rb.release.MarketingComment, commentEntry)
+	return rb
+}
+
+// WithMarketingCommentSimple adds a marketing comment to the release with worldwide territory
+func (rb *ReleaseBuilder) WithMarketingCommentSimple(comment string) *ReleaseBuilder {
+	return rb.WithMarketingComment(comment, "Worldwide", "")
+}
+
+// WithKeywords adds keywords to the release
+func (rb *ReleaseBuilder) WithKeywords(keywords, territoryCode, languageCode string) *ReleaseBuilder {
+	keywordsEntry := Keywords{
+		Value:                   keywords,
+		ApplicableTerritoryCode: territoryCode,
+		LanguageAndScriptCode:   languageCode,
+	}
+
+	rb.release.Keywords = append(rb.release.Keywords, keywordsEntry)
+	return rb
+}
+
+// WithKeywordsSimple adds keywords to the release with worldwide territory
+func (rb *ReleaseBuilder) WithKeywordsSimple(keywords string) *ReleaseBuilder {
+	return rb.WithKeywords(keywords, "Worldwide", "")
+}
+
+// WithContainsAI sets the AI contribution type for the release
+// Valid values typically include: "AIGenerated", "AIAssisted", "AITraining", "NoAI"
+func (rb *ReleaseBuilder) WithContainsAI(containsAI string) *ReleaseBuilder {
+	rb.release.ContainsAI = containsAI
 	return rb
 }
 

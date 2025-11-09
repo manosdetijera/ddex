@@ -51,7 +51,7 @@ func main() {
 		WithICPN("2023121700021").
 		WithTitle("Video display title", "Video").
 		WithDisplayArtistName("John Doe").
-		WithArtist("PJohnDoe", 1).
+		WithArtist("PJohnDoe", "MainArtist", 1).
 		WithLabel("PACME", "Worldwide").
 		WithPLine(2023, "(P) 2023 Some Pline text").
 		WithCLine(2023, "(C) 2023 Some CLine text").

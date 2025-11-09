@@ -26,6 +26,9 @@ type Release struct {
 	ParentalWarningType   string                  `xml:"ParentalWarningType,omitempty"`
 	RelatedResource       []RelatedResource       `xml:"RelatedResource,omitempty"`
 	ResourceGroup         []ResourceGroup         `xml:"ResourceGroup,omitempty"`
+	Keywords              []Keywords              `xml:"Keywords,omitempty"`
+	ContainsAI            string                  `xml:"ContainsAI,omitempty"`
+	MarketingComment      []MarketingComment      `xml:"MarketingComment,omitempty"`
 }
 
 // RelatedResource represents a resource that is related to the release

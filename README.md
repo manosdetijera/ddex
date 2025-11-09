@@ -278,6 +278,67 @@ builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
 
 **Important**: Each keyword must be in a separate tag. Do not combine multiple keywords in a single tag.
 
+#### Adding Marketing Comments
+
+Marketing comments provide information about the promotion and marketing of releases:
+
+```go
+// Add simple marketing comment (worldwide territory)
+release := builder.AddRelease("R1", "Single").
+    WithTitle("My Song", "").
+    WithMarketingCommentSimple("A powerful ballad about love and loss").
+    Done()
+
+// Add detailed marketing comment with territory and language
+release := builder.AddRelease("R1", "Album").
+    WithTitle("My Album", "").
+    WithMarketingComment("This compelling album explores themes of human connection through ten original compositions, blending elements of pop, rock, and soul.", "Worldwide", "en").
+    WithMarketingComment("Un album fascinant qui explore les thèmes de la connexion humaine.", "FR", "fr").
+    Done()
+```
+
+**Benefits**: 
+- Provides marketing context for releases
+- Supports promotional content distribution
+- Supports multiple languages and territories
+- ERN 4.3 compliant implementation (ddexC:MarketingComment)
+
+#### Adding AI Content Metadata
+
+Specify AI contribution types for releases using the ContainsAI element:
+
+```go
+// AI generated content
+release := builder.AddRelease("R1", "Single").
+    WithTitle("AI Generated Song", "").
+    WithContainsAI("AIGenerated").
+    Done()
+
+// AI assisted content
+release := builder.AddRelease("R1", "Album").
+    WithTitle("Hybrid Album", "").
+    WithContainsAI("AIAssisted").
+    Done()
+
+// No AI content
+release := builder.AddRelease("R1", "Album").
+    WithTitle("Human Created Album", "").
+    WithContainsAI("NoAI").
+    Done()
+```
+
+**Common Values**:
+- `AIGenerated`: Content created entirely by AI
+- `AIAssisted`: Human-created content with AI assistance
+- `AITraining`: Content used for AI training purposes
+- `NoAI`: No AI involvement in creation
+
+**Benefits**:
+- Transparency about AI involvement in content creation
+- Compliance with platform AI disclosure requirements
+- Helps streaming services categorize content appropriately
+- ERN 4.3 compliant implementation
+
 ### 5. Add Image Resources (Optional)
 
 ```go

@@ -99,4 +99,25 @@ type Keywords struct {
 	Value                   string   `xml:",chardata"`
 	ApplicableTerritoryCode string   `xml:"ApplicableTerritoryCode,attr,omitempty"`
 	LanguageAndScriptCode   string   `xml:"LanguageAndScriptCode,attr,omitempty"`
+	IsDefault               bool     `xml:"IsDefault,attr,omitempty"`
+}
+
+// SynopsisWithTerritory represents a synopsis with territory and language attributes
+// Following ERN 4.3 standard specification
+type SynopsisWithTerritory struct {
+	XMLName                 xml.Name `xml:"Synopsis"`
+	Value                   string   `xml:",chardata"`
+	ApplicableTerritoryCode string   `xml:"ApplicableTerritoryCode,attr,omitempty"`
+	LanguageAndScriptCode   string   `xml:"LanguageAndScriptCode,attr,omitempty"`
+	IsDefault               bool     `xml:"IsDefault,attr,omitempty"`
+}
+
+// MarketingComment represents a comment about the promotion and marketing of the Release
+// Following ERN 4.3 standard specification (ddexC:MarketingComment)
+type MarketingComment struct {
+	XMLName                 xml.Name `xml:"MarketingComment"`
+	Value                   string   `xml:",chardata"`
+	ApplicableTerritoryCode string   `xml:"ApplicableTerritoryCode,attr,omitempty"`
+	LanguageAndScriptCode   string   `xml:"LanguageAndScriptCode,attr,omitempty"`
+	IsDefault               bool     `xml:"IsDefault,attr,omitempty"`
 }
