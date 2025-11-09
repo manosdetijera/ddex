@@ -25,6 +25,7 @@ type Video struct {
 	Duration                 string                     `xml:"Duration,omitempty"`
 	CreationDate             CreationDate               `xml:"CreationDate,omitempty"`
 	ParentalWarningType      string                     `xml:"ParentalWarningType,omitempty"`
+	Keywords                 []Keywords                 `xml:"Keywords,omitempty"`
 }
 
 // VideoEdition represents different editions of a video
@@ -145,6 +146,7 @@ type CLine struct {
 type Genre struct {
 	XMLName                 xml.Name `xml:"Genre"`
 	GenreText               string   `xml:"GenreText"`
+	SubGenre                string   `xml:"SubGenre,omitempty"`
 	ApplicableTerritoryCode string   `xml:"ApplicableTerritoryCode,attr,omitempty"`
 }
 

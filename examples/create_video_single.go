@@ -24,15 +24,18 @@ func main() {
 		AddParty("PACME", "ACME music", "")
 
 	// Add video resource
-	builder.AddVideo("A1", "ShortFormMusicalWorkVideo", "QZ6GL1732999").
+	builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
+		WithISRC("QZ6GL1732999").
 		WithTitle("Video display title", "Video subtitle").
-		WithArtist("John Doe", "PJohnDoe", "MainArtist", 1).
+		WithDisplayArtistName("John Doe").
+		WithArtist("PJohnDoe", "MainArtist", 1).
 		WithRightsController("PACME", 100.00).
 		WithDuration("PT3M10S").
 		WithCreationDate("2023-01-01", true).
 		WithParentalWarning("NoAdviceAvailable").
 		WithPLine(2023, "(P) 2023 Some Pline text").
 		WithTechnicalDetails("T1", "vid.mpg").
+		AddKeywords("music video", "pop", "john doe").
 		AddProprietaryId("YOUTUBE:CHANNEL_ID", "UCQ0qe7vLz7uE_-sdtM9WB_w").
 		Done()
 
@@ -44,14 +47,16 @@ func main() {
 		Done()
 
 	// Add release
-	builder.AddRelease("R0", "VideoSingle", "2023121700021").
+	builder.AddRelease("R0", "VideoSingle").
+		WithICPN("2023121700021").
 		WithTitle("Video display title", "Video").
-		WithArtist("John Doe", "PJohnDoe", 1).
+		WithDisplayArtistName("John Doe").
+		WithArtist("PJohnDoe", 1).
 		WithLabel("PACME", "Worldwide").
 		WithPLine(2023, "(P) 2023 Some Pline text").
 		WithCLine(2023, "(C) 2023 Some CLine text").
 		WithDuration("PT6M36S").
-		WithGenre("Pop", "Worldwide").
+		WithGenreAndSubGenre("Pop", "Synthpop", "Worldwide").
 		WithParentalWarning("NoAdviceAvailable").
 		AddRelatedResource("HasContentFrom", "US1111111111").
 		AddResourceGroup("Component 1", 1).

@@ -241,17 +241,11 @@ func (nrm *NewReleaseMessage) GetReleaseIDs() []string {
 	if nrm.ReleaseList != nil {
 		for _, release := range nrm.ReleaseList.Release {
 			for _, releaseID := range release.ReleaseId {
-				if releaseID.ICPN != "" {
-					ids = append(ids, releaseID.ICPN)
+				if releaseID.ICPN != nil && releaseID.ICPN.Value != "" {
+					ids = append(ids, releaseID.ICPN.Value)
 				}
 				if releaseID.GRid != "" {
 					ids = append(ids, releaseID.GRid)
-				}
-				if releaseID.UPC != "" {
-					ids = append(ids, releaseID.UPC)
-				}
-				if releaseID.EAN != "" {
-					ids = append(ids, releaseID.EAN)
 				}
 			}
 		}

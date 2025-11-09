@@ -15,7 +15,7 @@
                 <FullName>YouTube</FullName>
             </PartyName>
         </MessageRecipient>
-        <MessageCreatedDateTime>2025-11-08T16:31:35-06:00</MessageCreatedDateTime>
+        <MessageCreatedDateTime>2025-11-08T20:03:06-06:00</MessageCreatedDateTime>
     </MessageHeader>
     <PartyList>
         <Party>
@@ -79,6 +79,9 @@
             <Duration>PT3M10S</Duration>
             <CreationDate IsApproximate="true">2023-01-01</CreationDate>
             <ParentalWarningType>NoAdviceAvailable</ParentalWarningType>
+            <Keywords ApplicableTerritoryCode="Worldwide">music video</Keywords>
+            <Keywords ApplicableTerritoryCode="Worldwide">pop</Keywords>
+            <Keywords ApplicableTerritoryCode="Worldwide">john doe</Keywords>
         </Video>
         <Image>
             <ResourceReference>A2</ResourceReference>
@@ -100,7 +103,7 @@
             <ReleaseReference>R0</ReleaseReference>
             <ReleaseType>VideoSingle</ReleaseType>
             <ReleaseId>
-                <ICPN>2023121700021</ICPN>
+                <ICPN IsEan="false">2023121700021</ICPN>
             </ReleaseId>
             <DisplayTitleText ApplicableTerritoryCode="Worldwide" LanguageAndScriptCode="en" IsDefault="true">Video display title</DisplayTitleText>
             <DisplayTitle>
@@ -124,6 +127,7 @@
             <Duration>PT6M36S</Duration>
             <Genre ApplicableTerritoryCode="Worldwide">
                 <GenreText>Pop</GenreText>
+                <SubGenre>Synthpop</SubGenre>
             </Genre>
             <ParentalWarningType>NoAdviceAvailable</ParentalWarningType>
             <RelatedResource>

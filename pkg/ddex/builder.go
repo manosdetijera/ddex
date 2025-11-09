@@ -94,18 +94,10 @@ func (b *Builder) AddParty(reference, fullName, fullNameIndexed string) *Builder
 }
 
 // AddVideo adds a video resource
-func (b *Builder) AddVideo(resourceRef, videoType, isrc string) *VideoBuilder {
+func (b *Builder) AddVideo(resourceRef, videoType string) *VideoBuilder {
 	video := &Video{
 		ResourceReference: resourceRef,
 		Type:              videoType,
-	}
-
-	if isrc != "" {
-		video.VideoEdition = append(video.VideoEdition, VideoEdition{
-			ResourceId: []VideoId{
-				{ISRC: isrc},
-			},
-		})
 	}
 
 	b.Message.ResourceList.Video = append(b.Message.ResourceList.Video, *video)
@@ -134,16 +126,10 @@ func (b *Builder) AddImage(resourceRef, imageType string) *ImageBuilder {
 }
 
 // AddRelease adds a release to the release list
-func (b *Builder) AddRelease(releaseRef, releaseType, icpn string) *ReleaseBuilder {
+func (b *Builder) AddRelease(releaseRef, releaseType string) *ReleaseBuilder {
 	release := &Release{
 		ReleaseReference: releaseRef,
 		ReleaseType:      releaseType,
-	}
-
-	if icpn != "" {
-		release.ReleaseId = []ReleaseId{
-			{ICPN: icpn},
-		}
 	}
 
 	b.Message.ReleaseList.Release = append(b.Message.ReleaseList.Release, *release)
@@ -225,10 +211,14 @@ func (vb *VideoBuilder) WithTitle(title, subtitle string) *VideoBuilder {
 	return vb
 }
 
-// WithArtist sets the video artist
-func (vb *VideoBuilder) WithArtist(artistName, partyRef, role string, sequence int) *VideoBuilder {
+// WithDisplayArtistName sets the display artist name for the video
+func (vb *VideoBuilder) WithDisplayArtistName(artistName string) *VideoBuilder {
 	vb.video.DisplayArtistName = []string{artistName}
+	return vb
+}
 
+// WithArtist adds a display artist reference to the video
+func (vb *VideoBuilder) WithArtist(partyRef, role string, sequence int) *VideoBuilder {
 	if partyRef != "" {
 		vb.video.DisplayArtist = append(vb.video.DisplayArtist, DisplayArtist{
 			ArtistPartyReference: partyRef,
@@ -311,6 +301,42 @@ func (vb *VideoBuilder) WithTechnicalDetails(techRef, fileURI string) *VideoBuil
 		},
 	}
 
+	return vb
+}
+
+// WithISRC sets the ISRC for the video
+func (vb *VideoBuilder) WithISRC(isrc string) *VideoBuilder {
+	if len(vb.video.VideoEdition) == 0 {
+		vb.video.VideoEdition = append(vb.video.VideoEdition, VideoEdition{})
+	}
+
+	vb.video.VideoEdition[0].ResourceId = append(vb.video.VideoEdition[0].ResourceId, VideoId{
+		ISRC: isrc,
+	})
+
+	return vb
+}
+
+// AddKeywords adds keywords for enhanced search and display
+func (vb *VideoBuilder) AddKeywords(keywords ...string) *VideoBuilder {
+	for _, keyword := range keywords {
+		vb.video.Keywords = append(vb.video.Keywords, Keywords{
+			Value:                   keyword,
+			ApplicableTerritoryCode: "Worldwide",
+		})
+	}
+	return vb
+}
+
+// AddKeywordsWithTerritory adds keywords with specific territory and language
+func (vb *VideoBuilder) AddKeywordsWithTerritory(territoryCode, languageCode string, keywords ...string) *VideoBuilder {
+	for _, keyword := range keywords {
+		vb.video.Keywords = append(vb.video.Keywords, Keywords{
+			Value:                   keyword,
+			ApplicableTerritoryCode: territoryCode,
+			LanguageAndScriptCode:   languageCode,
+		})
+	}
 	return vb
 }
 
@@ -404,10 +430,14 @@ func (rb *ReleaseBuilder) WithTitle(title, subtitle string) *ReleaseBuilder {
 	return rb
 }
 
-// WithArtist sets the release artist
-func (rb *ReleaseBuilder) WithArtist(artistName, partyRef string, sequence int) *ReleaseBuilder {
+// WithDisplayArtistName sets the display artist name for the release
+func (rb *ReleaseBuilder) WithDisplayArtistName(artistName string) *ReleaseBuilder {
 	rb.release.DisplayArtistName = []string{artistName}
+	return rb
+}
 
+// WithArtist adds a display artist reference to the release
+func (rb *ReleaseBuilder) WithArtist(partyRef string, sequence int) *ReleaseBuilder {
 	if partyRef != "" {
 		rb.release.DisplayArtist = append(rb.release.DisplayArtist, DisplayArtist{
 			ArtistPartyReference: partyRef,
@@ -461,9 +491,60 @@ func (rb *ReleaseBuilder) WithGenre(genreText, territoryCode string) *ReleaseBui
 	return rb
 }
 
+// WithGenreAndSubGenre adds genre information with a subgenre
+func (rb *ReleaseBuilder) WithGenreAndSubGenre(genreText, subGenre, territoryCode string) *ReleaseBuilder {
+	rb.release.Genre = append(rb.release.Genre, Genre{
+		GenreText:               genreText,
+		SubGenre:                subGenre,
+		ApplicableTerritoryCode: territoryCode,
+	})
+	return rb
+}
+
 // WithParentalWarning sets the parental warning type
 func (rb *ReleaseBuilder) WithParentalWarning(warningType string) *ReleaseBuilder {
 	rb.release.ParentalWarningType = warningType
+	return rb
+}
+
+// WithUPC sets the UPC identifier for the release
+func (rb *ReleaseBuilder) WithUPC(upc string) *ReleaseBuilder {
+	rb.release.ReleaseId = append(rb.release.ReleaseId, ReleaseId{
+		ICPN: &ICPN{
+			Value: upc,
+			IsEan: false,
+		},
+	})
+	return rb
+}
+
+// WithEAN sets the EAN identifier for the release
+func (rb *ReleaseBuilder) WithEAN(ean string) *ReleaseBuilder {
+	rb.release.ReleaseId = append(rb.release.ReleaseId, ReleaseId{
+		ICPN: &ICPN{
+			Value: ean,
+			IsEan: true,
+		},
+	})
+	return rb
+}
+
+// WithICPN sets a generic ICPN identifier (use WithUPC or WithEAN for better clarity)
+func (rb *ReleaseBuilder) WithICPN(icpn string) *ReleaseBuilder {
+	rb.release.ReleaseId = append(rb.release.ReleaseId, ReleaseId{
+		ICPN: &ICPN{
+			Value: icpn,
+			IsEan: false, // Default to UPC format
+		},
+	})
+	return rb
+}
+
+// WithGRid sets the GRid identifier for the release
+func (rb *ReleaseBuilder) WithGRid(grid string) *ReleaseBuilder {
+	rb.release.ReleaseId = append(rb.release.ReleaseId, ReleaseId{
+		GRid: grid,
+	})
 	return rb
 }
 

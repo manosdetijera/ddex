@@ -53,9 +53,11 @@ func main() {
     builder.AddParty("P1", "Artist Name", "Name, Artist")
 
     // Add video resource
-    builder.AddVideo("A1", "ShortFormMusicalWorkVideo", "USXX12300001").
+    builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
+        WithISRC("USXX12300001").
         WithTitle("My Video Title", "Subtitle").
-        WithArtist("Artist Name", "P1", "MainArtist", 1).
+        WithDisplayArtistName("Artist Name").
+        WithArtist("P1", "MainArtist", 1).
         WithDuration("PT3M30S").
         WithCreationDate("2024-01-01", false).
         WithParentalWarning("NoAdviceAvailable").
@@ -63,9 +65,11 @@ func main() {
         Done()
 
     // Add release
-    builder.AddRelease("R1", "VideoSingle", "1234567890123").
+    builder.AddRelease("R1", "VideoSingle").
+        WithUPC("1234567890123").
         WithTitle("My Video Title", "").
-        WithArtist("Artist Name", "P1", 1).
+        WithDisplayArtistName("Artist Name").
+        WithArtist("P1", 1).
         WithGenre("Pop", "Worldwide").
         AddResourceGroup("", 1).
         AddContentItem(1, "A1").
@@ -116,9 +120,11 @@ func main() {
         AddParty("PACME", "ACME music", "")
 
     // Add video resource
-    builder.AddVideo("A1", "ShortFormMusicalWorkVideo", "QZ6GL1732999").
+    builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
+        WithISRC("QZ6GL1732999").
         WithTitle("Video display title", "Video subtitle").
-        WithArtist("John Doe", "PJohnDoe", "MainArtist", 1).
+        WithDisplayArtistName("John Doe").
+        WithArtist("PJohnDoe", "MainArtist", 1).
         WithRightsController("PACME", 100.00).
         WithDuration("PT3M10S").
         WithCreationDate("2023-01-01", true).
@@ -136,9 +142,11 @@ func main() {
         Done()
 
     // Add release with related resource
-    builder.AddRelease("R0", "VideoSingle", "2023121700021").
+    builder.AddRelease("R0", "VideoSingle").
+        WithICPN("2023121700021").
         WithTitle("Video display title", "Video").
-        WithArtist("John Doe", "PJohnDoe", 1).
+        WithDisplayArtistName("John Doe").
+        WithArtist("PJohnDoe", 1).
         WithLabel("PACME", "Worldwide").
         WithPLine(2023, "(P) 2023 Some Pline text").
         WithCLine(2023, "(C) 2023 Some CLine text").
@@ -217,18 +225,58 @@ builder.AddParty("P_LABEL", "ACME Records", "")
 ### 4. Add Video Resource
 
 ```go
-builder.AddVideo("A1", "ShortFormMusicalWorkVideo", "ISRC_CODE").
+builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
+    WithISRC("ISRC_CODE").
     WithTitle("Video Title", "Subtitle").
-    WithArtist("Artist Name", "PARTY_REF", "MainArtist", 1).
+    WithDisplayArtistName("Artist Name").
+    WithArtist("PARTY_REF", "MainArtist", 1).
     WithRightsController("LABEL_REF", 100.00).
     WithDuration("PT3M10S").                    // ISO 8601 duration
     WithCreationDate("2024-01-01", false).      // Date and isApproximate flag
     WithParentalWarning("NoAdviceAvailable").
     WithPLine(2024, "(P) 2024 Label Name").
     WithTechnicalDetails("T1", "video.mp4").
+    AddKeywords("music video", "pop", "rock").          // Add keywords for search/display
     AddProprietaryId("YOUTUBE:CHANNEL_ID", "UCxxxxxxx").
     Done()
 ```
+
+#### Setting Artist Information
+
+Artist information consists of two parts - the display name and the artist reference:
+
+```go
+builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
+    WithDisplayArtistName("Artist Name").           // How the artist name appears
+    WithArtist("PARTY_REF", "MainArtist", 1).      // Reference to party definition
+    Done()
+
+// Multiple artists with separate references
+builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
+    WithDisplayArtistName("Artist One feat. Artist Two").
+    WithArtist("PARTY_REF_1", "MainArtist", 1).
+    WithArtist("PARTY_REF_2", "FeaturedArtist", 2).
+    Done()
+```
+
+#### Adding Keywords
+
+Keywords enhance user experiences by providing DSPs with information for content display and music searches:
+
+```go
+// Add simple keywords (worldwide territory)
+builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
+    AddKeywords("music video", "pop", "rock", "ballad").
+    Done()
+
+// Add keywords with specific territory and language
+builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
+    AddKeywordsWithTerritory("US", "en", "american", "billboard").
+    AddKeywordsWithTerritory("GB", "en", "british", "uk charts").
+    Done()
+```
+
+**Important**: Each keyword must be in a separate tag. Do not combine multiple keywords in a single tag.
 
 ### 5. Add Image Resources (Optional)
 
@@ -243,9 +291,11 @@ builder.AddImage("A2", "VideoScreenCapture").
 ### 6. Add Release
 
 ```go
-builder.AddRelease("R1", "VideoSingle", "UPC_OR_EAN").
+builder.AddRelease("R1", "VideoSingle").
+    WithUPC("123456789012").          // or WithEAN("1234567890123")
     WithTitle("Release Title", "Subtitle").
-    WithArtist("Artist Name", "PARTY_REF", 1).
+    WithDisplayArtistName("Artist Name").
+    WithArtist("PARTY_REF", 1).
     WithLabel("LABEL_REF", "Worldwide").
     WithPLine(2024, "(P) 2024 Label").
     WithCLine(2024, "(C) 2024 Copyright Holder").
@@ -260,12 +310,58 @@ builder.AddRelease("R1", "VideoSingle", "UPC_OR_EAN").
     Done()
 ```
 
+#### Genre and SubGenre
+
+Set genre information for releases with optional subgenres:
+
+```go
+// Simple genre
+builder.AddRelease("R1", "VideoSingle").
+    WithGenre("Rock", "Worldwide").
+    Done()
+
+// Genre with subgenre
+builder.AddRelease("R1", "VideoSingle").
+    WithGenreAndSubGenre("Blues", "Bluesrock", "Worldwide").
+    Done()
+
+// Multiple genres (no hierarchy implied)
+builder.AddRelease("R1", "VideoSingle").
+    WithGenreAndSubGenre("Pop", "Synthpop", "Worldwide").
+    WithGenre("Electronic", "US").
+    Done()
+```
+
+**Note**: Multiple genres do not imply hierarchy. Each represents an equally valid classification.
+
+#### Release Identifiers
+
+Set UPC, EAN, or other identifiers for the release:
+
+```go
+// Using UPC (12 digits)
+builder.AddRelease("R1", "VideoSingle").
+    WithUPC("123456789012").
+    Done()
+
+// Using EAN (13 digits)
+builder.AddRelease("R1", "VideoSingle").
+    WithEAN("1234567890123").
+    Done()
+
+// Using GRid
+builder.AddRelease("R1", "VideoSingle").
+    WithGRid("A12425GABC1234002M").
+    Done()
+```
+
 #### Related Resources
 
 To indicate that a release uses content from another resource (e.g., a music track), use `AddRelatedResource`:
 
 ```go
-builder.AddRelease("R1", "VideoSingle", "123456789012").
+builder.AddRelease("R1", "VideoSingle").
+    WithUPC("123456789012").
     // ... other details ...
     AddRelatedResource("HasContentFrom", "US1111111111").  // ISRC of the related resource
     AddResourceGroup("Component 1", 1).
@@ -379,7 +475,8 @@ builder.AddRecipient("PADPIDA1234567", "Recipient Name")
 ### Multiple Resource Groups
 
 ```go
-builder.AddRelease("R1", "VideoAlbum", "123456789012").
+builder.AddRelease("R1", "VideoAlbum").
+    WithUPC("123456789012").
     // ... other details ...
     AddResourceGroup("Disc 1", 1).
         AddContentItem(1, "A1").

@@ -92,3 +92,11 @@ type Duration struct {
 	XMLName xml.Name `xml:"Duration"`
 	Value   string   `xml:",chardata"` // ISO 8601 duration format (PT3M30S)
 }
+
+// Keywords represents keywords for enhanced search and display
+type Keywords struct {
+	XMLName                 xml.Name `xml:"Keywords"`
+	Value                   string   `xml:",chardata"`
+	ApplicableTerritoryCode string   `xml:"ApplicableTerritoryCode,attr,omitempty"`
+	LanguageAndScriptCode   string   `xml:"LanguageAndScriptCode,attr,omitempty"`
+}
