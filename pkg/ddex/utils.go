@@ -161,15 +161,15 @@ func ValidateDPID(dpid string) bool {
 	return matched
 }
 
-// FormatDuration formats a duration in seconds to ISO 8601 duration format (PT3M30S)
-func FormatDuration(seconds int) string {
+// FormatDuration formats a duration in seconds to ISO 8601 duration format (PT3M30S or PT4M23.583S)
+func FormatDuration(seconds float64) string {
 	if seconds <= 0 {
 		return "PT0S"
 	}
 
-	hours := seconds / 3600
-	minutes := (seconds % 3600) / 60
-	secs := seconds % 60
+	hours := int(seconds) / 3600
+	minutes := (int(seconds) % 3600) / 60
+	secs := seconds - float64(hours*3600) - float64(minutes*60)
 
 	duration := "PT"
 	if hours > 0 {
@@ -179,7 +179,8 @@ func FormatDuration(seconds int) string {
 		duration += fmt.Sprintf("%dM", minutes)
 	}
 	if secs > 0 || (hours == 0 && minutes == 0) {
-		duration += fmt.Sprintf("%dS", secs)
+		// Format seconds with up to 3 decimal places, removing trailing zeros
+		duration += strings.TrimRight(strings.TrimRight(fmt.Sprintf("%.3f", secs), "0"), ".") + "S"
 	}
 
 	return duration
