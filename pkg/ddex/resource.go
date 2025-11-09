@@ -17,13 +17,13 @@ type Video struct {
 	ResourceReference        string                     `xml:"ResourceReference"`
 	Type                     string                     `xml:"Type,omitempty"`
 	VideoEdition             []VideoEdition             `xml:"VideoEdition,omitempty"`
-	DisplayTitleText         DisplayTitleText           `xml:"DisplayTitleText"`
-	DisplayTitle             DisplayTitle               `xml:"DisplayTitle"`
+	DisplayTitleText         *DisplayTitleText          `xml:"DisplayTitleText,omitempty"`
+	DisplayTitle             *DisplayTitle              `xml:"DisplayTitle,omitempty"`
 	DisplayArtistName        []string                   `xml:"DisplayArtistName,omitempty"`
 	DisplayArtist            []DisplayArtist            `xml:"DisplayArtist,omitempty"`
 	ResourceRightsController []ResourceRightsController `xml:"ResourceRightsController,omitempty"`
 	Duration                 string                     `xml:"Duration,omitempty"`
-	CreationDate             CreationDate               `xml:"CreationDate,omitempty"`
+	CreationDate             *CreationDate              `xml:"CreationDate,omitempty"`
 	ParentalWarningType      string                     `xml:"ParentalWarningType,omitempty"`
 	Keywords                 []Keywords                 `xml:"Keywords,omitempty"`
 }
@@ -61,21 +61,21 @@ type ImageId struct {
 
 // SoundRecording represents an audio resource
 type SoundRecording struct {
-	XMLName           xml.Name         `xml:"SoundRecording"`
-	ResourceReference string           `xml:"ResourceReference"`
-	Type              string           `xml:"Type,omitempty"`
-	ResourceId        []ResourceID     `xml:"ResourceId,omitempty"`
-	DisplayTitleText  DisplayTitleText `xml:"DisplayTitleText"`
-	DisplayTitle      DisplayTitle     `xml:"DisplayTitle"`
+	XMLName           xml.Name          `xml:"SoundRecording"`
+	ResourceReference string            `xml:"ResourceReference"`
+	Type              string            `xml:"Type,omitempty"`
+	ResourceId        []ResourceID      `xml:"ResourceId,omitempty"`
+	DisplayTitleText  *DisplayTitleText `xml:"DisplayTitleText,omitempty"`
+	DisplayTitle      *DisplayTitle     `xml:"DisplayTitle,omitempty"`
 }
 
 // Text represents a text resource
 type Text struct {
-	XMLName           xml.Name         `xml:"Text"`
-	ResourceReference string           `xml:"ResourceReference"`
-	Type              string           `xml:"Type,omitempty"`
-	ResourceId        []ResourceID     `xml:"ResourceId,omitempty"`
-	DisplayTitleText  DisplayTitleText `xml:"DisplayTitleText"`
+	XMLName           xml.Name          `xml:"Text"`
+	ResourceReference string            `xml:"ResourceReference"`
+	Type              string            `xml:"Type,omitempty"`
+	ResourceId        []ResourceID      `xml:"ResourceId,omitempty"`
+	DisplayTitleText  *DisplayTitleText `xml:"DisplayTitleText,omitempty"`
 }
 
 // ResourceRightsController represents rights controller for a resource

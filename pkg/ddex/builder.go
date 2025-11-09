@@ -193,14 +193,14 @@ type VideoBuilder struct {
 
 // WithTitle sets the video title
 func (vb *VideoBuilder) WithTitle(title, subtitle string) *VideoBuilder {
-	vb.video.DisplayTitleText = DisplayTitleText{
+	vb.video.DisplayTitleText = &DisplayTitleText{
 		Value:                   title,
 		ApplicableTerritoryCode: "Worldwide",
 		LanguageAndScriptCode:   "en",
 		IsDefault:               true,
 	}
 
-	displayTitle := DisplayTitle{
+	displayTitle := &DisplayTitle{
 		TitleText: []TitleText{{Value: title}},
 	}
 	if subtitle != "" {
@@ -255,7 +255,7 @@ func (vb *VideoBuilder) WithDuration(duration string) *VideoBuilder {
 
 // WithCreationDate sets the creation date
 func (vb *VideoBuilder) WithCreationDate(date string, isApproximate bool) *VideoBuilder {
-	vb.video.CreationDate = CreationDate{
+	vb.video.CreationDate = &CreationDate{
 		Value:         date,
 		IsApproximate: isApproximate,
 	}
