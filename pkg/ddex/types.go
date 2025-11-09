@@ -34,6 +34,15 @@ func (dt *DateTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	return nil
 }
 
+// EventDateWithDefault represents a date with territory for ERN events (ISO 8601 format)
+// Following ERN 4.3 standard specification for ReleaseDate and OriginalReleaseDate
+type EventDateWithDefault struct {
+	XMLName                 xml.Name `xml:",omitempty"`
+	Value                   string   `xml:",chardata"`
+	ApplicableTerritoryCode string   `xml:"ApplicableTerritoryCode,attr,omitempty"`
+	IsDefault               bool     `xml:"IsDefault,attr,omitempty"`
+}
+
 // PartyID represents various party identification types
 type PartyID struct {
 	XMLName   xml.Name `xml:"PartyId"`

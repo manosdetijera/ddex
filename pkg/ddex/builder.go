@@ -482,6 +482,23 @@ func (rb *ReleaseBuilder) WithDuration(duration string) *ReleaseBuilder {
 	return rb
 }
 
+// WithReleaseDate sets both ReleaseDate and OriginalReleaseDate to the same date value
+// Date should be in ISO 8601 format (YYYY, YYYY-MM, or YYYY-MM-DD)
+func (rb *ReleaseBuilder) WithReleaseDate(date string) *ReleaseBuilder {
+	releaseDateEntry := EventDateWithDefault{
+		XMLName: xml.Name{Local: "ReleaseDate"},
+		Value:   date,
+	}
+	originalReleaseDateEntry := EventDateWithDefault{
+		XMLName: xml.Name{Local: "OriginalReleaseDate"},
+		Value:   date,
+	}
+
+	rb.release.ReleaseDate = append(rb.release.ReleaseDate, releaseDateEntry)
+	rb.release.OriginalReleaseDate = append(rb.release.OriginalReleaseDate, originalReleaseDateEntry)
+	return rb
+}
+
 // WithGenre adds genre information
 func (rb *ReleaseBuilder) WithGenre(genreText, territoryCode string) *ReleaseBuilder {
 	rb.release.Genre = append(rb.release.Genre, Genre{

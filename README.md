@@ -339,6 +339,32 @@ release := builder.AddRelease("R1", "Album").
 - Helps streaming services categorize content appropriately
 - ERN 4.3 compliant implementation
 
+#### Adding Release Dates
+
+Release dates provide timing information for when content was or will be made available:
+
+```go
+// Set release date (sets both ReleaseDate and OriginalReleaseDate)
+release := builder.AddRelease("R1", "Single").
+    WithTitle("My Song", "").
+    WithReleaseDate("2023-12-01").
+    Done()
+
+// Different date formats supported
+release := builder.AddRelease("R1", "Album").
+    WithTitle("My Album", "").
+    WithReleaseDate("2023").           // Year only
+    // or WithReleaseDate("2023-12").   // Year and month
+    // or WithReleaseDate("2023-12-01") // Full date
+    Done()
+```
+
+**Benefits**:
+- Provides timing context for releases
+- Sets both ReleaseDate and OriginalReleaseDate consistently
+- Supports ISO 8601 date formats (YYYY, YYYY-MM, YYYY-MM-DD)
+- ERN 4.3 compliant implementation (ern:EventDateWithDefault)
+
 ### 5. Add Image Resources (Optional)
 
 ```go
