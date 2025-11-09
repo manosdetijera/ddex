@@ -230,6 +230,20 @@ func (vb *VideoBuilder) WithArtist(partyRef, role string, sequence int) *VideoBu
 	return vb
 }
 
+// WithContributor adds a contributor to the video resource
+// role can be multiple values like "Producer", "Director", "Cinematographer", etc.
+func (vb *VideoBuilder) WithContributor(partyRef string, roles []string, sequence int) *VideoBuilder {
+	if partyRef != "" && len(roles) > 0 {
+		vb.video.Contributor = append(vb.video.Contributor, Contributor{
+			PartyReference: partyRef,
+			Role:           roles,
+			SequenceNumber: sequence,
+		})
+	}
+
+	return vb
+}
+
 // WithRightsController sets the rights controller
 func (vb *VideoBuilder) WithRightsController(partyRef string, percentage float64) *VideoBuilder {
 	vb.video.ResourceRightsController = append(vb.video.ResourceRightsController, ResourceRightsController{

@@ -21,6 +21,7 @@ type Video struct {
 	DisplayTitle             *DisplayTitle              `xml:"DisplayTitle,omitempty"`
 	DisplayArtistName        []string                   `xml:"DisplayArtistName,omitempty"`
 	DisplayArtist            []DisplayArtist            `xml:"DisplayArtist,omitempty"`
+	Contributor              []Contributor              `xml:"Contributor,omitempty"`
 	ResourceRightsController []ResourceRightsController `xml:"ResourceRightsController,omitempty"`
 	Duration                 string                     `xml:"Duration,omitempty"`
 	CreationDate             *CreationDate              `xml:"CreationDate,omitempty"`
