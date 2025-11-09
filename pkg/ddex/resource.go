@@ -150,6 +150,15 @@ type Genre struct {
 	ApplicableTerritoryCode string   `xml:"ApplicableTerritoryCode,attr,omitempty"`
 }
 
+// DisplayGenre represents genre information for display purposes (used in Release)
+// Following ERN 4.3 standard specification
+type DisplayGenre struct {
+	XMLName                 xml.Name `xml:"DisplayGenre"`
+	GenreText               string   `xml:"GenreText"`
+	SubGenre                string   `xml:"SubGenre,omitempty"`
+	ApplicableTerritoryCode string   `xml:"ApplicableTerritoryCode,attr,omitempty"`
+}
+
 type Contributor struct {
 	XMLName        xml.Name `xml:"Contributor"`
 	SequenceNumber int      `xml:"SequenceNumber,attr,omitempty"`

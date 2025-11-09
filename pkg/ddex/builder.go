@@ -501,7 +501,7 @@ func (rb *ReleaseBuilder) WithReleaseDate(date string) *ReleaseBuilder {
 
 // WithGenre adds genre information
 func (rb *ReleaseBuilder) WithGenre(genreText, territoryCode string) *ReleaseBuilder {
-	rb.release.Genre = append(rb.release.Genre, Genre{
+	rb.release.DisplayGenre = append(rb.release.DisplayGenre, DisplayGenre{
 		GenreText:               genreText,
 		ApplicableTerritoryCode: territoryCode,
 	})
@@ -510,7 +510,7 @@ func (rb *ReleaseBuilder) WithGenre(genreText, territoryCode string) *ReleaseBui
 
 // WithGenreAndSubGenre adds genre information with a subgenre
 func (rb *ReleaseBuilder) WithGenreAndSubGenre(genreText, subGenre, territoryCode string) *ReleaseBuilder {
-	rb.release.Genre = append(rb.release.Genre, Genre{
+	rb.release.DisplayGenre = append(rb.release.DisplayGenre, DisplayGenre{
 		GenreText:               genreText,
 		SubGenre:                subGenre,
 		ApplicableTerritoryCode: territoryCode,

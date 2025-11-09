@@ -15,7 +15,7 @@
                 <FullName>YouTube</FullName>
             </PartyName>
         </MessageRecipient>
-        <MessageCreatedDateTime>2025-11-08T22:07:36-06:00</MessageCreatedDateTime>
+        <MessageCreatedDateTime>2025-11-09T14:57:44-06:00</MessageCreatedDateTime>
     </MessageHeader>
     <PartyList>
         <Party>
@@ -125,10 +125,10 @@
                 <CLineText>(C) 2023 Some CLine text</CLineText>
             </CLine>
             <Duration>PT6M36S</Duration>
-            <Genre ApplicableTerritoryCode="Worldwide">
+            <DisplayGenre ApplicableTerritoryCode="Worldwide">
                 <GenreText>Pop</GenreText>
                 <SubGenre>Synthpop</SubGenre>
-            </Genre>
+            </DisplayGenre>
             <ParentalWarningType>NoAdviceAvailable</ParentalWarningType>
             <RelatedResource>
                 <ResourceRelationshipType>HasContentFrom</ResourceRelationshipType>

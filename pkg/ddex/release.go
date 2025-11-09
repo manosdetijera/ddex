@@ -22,9 +22,9 @@ type Release struct {
 	PLine                 []PLine                 `xml:"PLine,omitempty"`
 	CLine                 []CLine                 `xml:"CLine,omitempty"`
 	Duration              string                  `xml:"Duration,omitempty"`
-	Genre                 []Genre                 `xml:"Genre,omitempty"`
 	ReleaseDate           []EventDateWithDefault  `xml:"ReleaseDate,omitempty"`
 	OriginalReleaseDate   []EventDateWithDefault  `xml:"OriginalReleaseDate,omitempty"`
+	DisplayGenre          []DisplayGenre          `xml:"DisplayGenre,omitempty"`
 	ParentalWarningType   string                  `xml:"ParentalWarningType,omitempty"`
 	RelatedResource       []RelatedResource       `xml:"RelatedResource,omitempty"`
 	ResourceGroup         []ResourceGroup         `xml:"ResourceGroup,omitempty"`
