@@ -67,7 +67,7 @@ func main() {
 
 	// Add deal
 	builder.AddDeal("R0").
-		WithTerritory("Worldwide").
+		WithTerritories([]string{"Worldwide"}).
 		WithValidityPeriod("2023-12-01").
 		AddCommercialModel("SubscriptionModel").
 		AddCommercialModel("AdvertisementSupportedModel").

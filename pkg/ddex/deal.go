@@ -24,7 +24,7 @@ type Deal struct {
 // DealTerms represents the commercial terms of a deal
 type DealTerms struct {
 	XMLName             xml.Name        `xml:"DealTerms"`
-	TerritoryCode       string          `xml:"TerritoryCode,omitempty"`
+	TerritoryCode       []string        `xml:"TerritoryCode,omitempty"`
 	ValidityPeriod      *ValidityPeriod `xml:"ValidityPeriod,omitempty"`
 	CommercialModelType []string        `xml:"CommercialModelType,omitempty"`
 	UseType             []string        `xml:"UseType,omitempty"`

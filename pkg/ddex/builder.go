@@ -727,11 +727,12 @@ type DealBuilder struct {
 }
 
 // WithTerritory sets the deal territory
-func (db *DealBuilder) WithTerritory(territoryCode string) *DealBuilder {
+// WithTerritories sets the deal territories
+func (db *DealBuilder) WithTerritories(territoryCodes []string) *DealBuilder {
 	if db.deal.DealTerms == nil {
 		db.deal.DealTerms = &DealTerms{}
 	}
-	db.deal.DealTerms.TerritoryCode = territoryCode
+	db.deal.DealTerms.TerritoryCode = territoryCodes
 	return db
 }
 
@@ -777,6 +778,19 @@ func (db *DealBuilder) AddUseType(useType string) *DealBuilder {
 	}
 	db.deal.DealTerms.UseType = append(db.deal.DealTerms.UseType, useType)
 	return db
+}
+
+// NextDeal adds a new Deal to the current ReleaseDeal and returns a DealBuilder for it
+func (db *DealBuilder) NextDeal() *DealBuilder {
+	newDeal := Deal{}
+	db.releaseDeal.Deal = append(db.releaseDeal.Deal, newDeal)
+	dealIndex := len(db.releaseDeal.Deal) - 1
+
+	return &DealBuilder{
+		builder:     db.builder,
+		releaseDeal: db.releaseDeal,
+		deal:        &db.releaseDeal.Deal[dealIndex],
+	}
 }
 
 // Done returns to the main builder
