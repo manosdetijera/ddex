@@ -23,11 +23,12 @@ type Deal struct {
 
 // DealTerms represents the commercial terms of a deal
 type DealTerms struct {
-	XMLName             xml.Name        `xml:"DealTerms"`
-	TerritoryCode       []string        `xml:"TerritoryCode,omitempty"`
-	ValidityPeriod      *ValidityPeriod `xml:"ValidityPeriod,omitempty"`
-	CommercialModelType []string        `xml:"CommercialModelType,omitempty"`
-	UseType             []string        `xml:"UseType,omitempty"`
+	XMLName             xml.Name           `xml:"DealTerms"`
+	TerritoryCode       []string           `xml:"TerritoryCode,omitempty"`
+	ValidityPeriod      *ValidityPeriod    `xml:"ValidityPeriod,omitempty"`
+	CommercialModelType []string           `xml:"CommercialModelType,omitempty"`
+	UseType             []string           `xml:"UseType,omitempty"`
+	RightsClaimPolicy   *RightsClaimPolicy `xml:"RightsClaimPolicy,omitempty"`
 }
 
 // ValidityPeriod represents time period validity information
@@ -36,4 +37,10 @@ type ValidityPeriod struct {
 	StartDate     string   `xml:"StartDate,omitempty"`
 	StartDateTime string   `xml:"StartDateTime,omitempty"`
 	EndDate       string   `xml:"EndDate,omitempty"`
+}
+
+// RightsClaimPolicy represents a policy for claiming rights
+type RightsClaimPolicy struct {
+	XMLName               xml.Name `xml:"RightsClaimPolicy"`
+	RightsClaimPolicyType string   `xml:"RightsClaimPolicyType"`
 }

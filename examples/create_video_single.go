@@ -66,7 +66,8 @@ func main() {
 		Done()
 
 	// Add deal
-	builder.AddDeal("R0").
+	builder.AddReleaseDeal("R0").
+		AddDeal().
 		WithTerritories([]string{"Worldwide"}).
 		WithValidityPeriod("2023-12-01").
 		AddCommercialModel("SubscriptionModel").
@@ -74,6 +75,7 @@ func main() {
 		AddUseType("NonInteractiveStream").
 		AddUseType("OnDemandStream").
 		AddUseType("Stream").
+		Done().
 		Done()
 
 	// Write to file

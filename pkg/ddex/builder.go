@@ -142,19 +142,19 @@ func (b *Builder) AddRelease(releaseRef, releaseType string) *ReleaseBuilder {
 }
 
 // AddDeal adds a deal to the deal list
-func (b *Builder) AddDeal(releaseRef string) *DealBuilder {
-	deal := &ReleaseDeal{
+// AddReleaseDeal adds a release deal to the deal list
+func (b *Builder) AddReleaseDeal(releaseRef string) *ReleaseDealBuilder {
+	releaseDeal := &ReleaseDeal{
 		DealReleaseReference: releaseRef,
-		Deal:                 []Deal{{}},
+		Deal:                 []Deal{},
 	}
 
-	b.Message.DealList.ReleaseDeal = append(b.Message.DealList.ReleaseDeal, *deal)
+	b.Message.DealList.ReleaseDeal = append(b.Message.DealList.ReleaseDeal, *releaseDeal)
 	dealIndex := len(b.Message.DealList.ReleaseDeal) - 1
 
-	return &DealBuilder{
+	return &ReleaseDealBuilder{
 		builder:     b,
 		releaseDeal: &b.Message.DealList.ReleaseDeal[dealIndex],
-		deal:        &b.Message.DealList.ReleaseDeal[dealIndex].Deal[0],
 	}
 }
 
@@ -719,11 +719,35 @@ func (rgb *ResourceGroupBuilder) Done() *ReleaseBuilder {
 	return rgb.releaseBuilder
 }
 
-// DealBuilder provides fluent interface for building deals
-type DealBuilder struct {
+// ReleaseDealBuilder provides fluent interface for building release deals
+type ReleaseDealBuilder struct {
 	builder     *Builder
 	releaseDeal *ReleaseDeal
-	deal        *Deal
+}
+
+// AddDeal adds a new deal to the release deal
+func (rdb *ReleaseDealBuilder) AddDeal() *DealBuilder {
+	newDeal := Deal{}
+	rdb.releaseDeal.Deal = append(rdb.releaseDeal.Deal, newDeal)
+	dealIndex := len(rdb.releaseDeal.Deal) - 1
+
+	return &DealBuilder{
+		builder:            rdb.builder,
+		releaseDealBuilder: rdb,
+		deal:               &rdb.releaseDeal.Deal[dealIndex],
+	}
+}
+
+// Done returns to the main builder
+func (rdb *ReleaseDealBuilder) Done() *Builder {
+	return rdb.builder
+}
+
+// DealBuilder provides fluent interface for building deals
+type DealBuilder struct {
+	builder            *Builder
+	releaseDealBuilder *ReleaseDealBuilder
+	deal               *Deal
 }
 
 // WithTerritory sets the deal territory
@@ -780,20 +804,18 @@ func (db *DealBuilder) AddUseType(useType string) *DealBuilder {
 	return db
 }
 
-// NextDeal adds a new Deal to the current ReleaseDeal and returns a DealBuilder for it
-func (db *DealBuilder) NextDeal() *DealBuilder {
-	newDeal := Deal{}
-	db.releaseDeal.Deal = append(db.releaseDeal.Deal, newDeal)
-	dealIndex := len(db.releaseDeal.Deal) - 1
-
-	return &DealBuilder{
-		builder:     db.builder,
-		releaseDeal: db.releaseDeal,
-		deal:        &db.releaseDeal.Deal[dealIndex],
+// WithRightsClaimPolicy sets the rights claim policy for the deal
+func (db *DealBuilder) WithRightsClaimPolicy(policyType string) *DealBuilder {
+	if db.deal.DealTerms == nil {
+		db.deal.DealTerms = &DealTerms{}
 	}
+	db.deal.DealTerms.RightsClaimPolicy = &RightsClaimPolicy{
+		RightsClaimPolicyType: policyType,
+	}
+	return db
 }
 
-// Done returns to the main builder
-func (db *DealBuilder) Done() *Builder {
-	return db.builder
+// Done returns to the release deal builder
+func (db *DealBuilder) Done() *ReleaseDealBuilder {
+	return db.releaseDealBuilder
 }
