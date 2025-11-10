@@ -50,9 +50,10 @@ type RelatedResourceId struct {
 
 // ReleaseId represents release identification (ICPN, GRid, UPC, EAN, etc.)
 type ReleaseId struct {
-	XMLName xml.Name `xml:"ReleaseId"`
-	ICPN    *ICPN    `xml:"ICPN,omitempty"`
-	GRid    string   `xml:"GRid,omitempty"`
+	XMLName       xml.Name        `xml:"ReleaseId"`
+	ICPN          *ICPN           `xml:"ICPN,omitempty"`
+	GRid          string          `xml:"GRid,omitempty"`
+	ProprietaryId []ProprietaryId `xml:"ProprietaryId,omitempty"`
 }
 
 // ICPN represents UPC/EAN identifiers with proper IsEan attribute

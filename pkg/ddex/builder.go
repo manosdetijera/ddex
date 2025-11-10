@@ -645,6 +645,21 @@ func (rb *ReleaseBuilder) WithGRid(grid string) *ReleaseBuilder {
 	return rb
 }
 
+// AddProprietaryId adds a proprietary identifier to the release ID
+func (rb *ReleaseBuilder) AddProprietaryId(namespace, value string) *ReleaseBuilder {
+	// Find or create the first ReleaseId entry
+	if len(rb.release.ReleaseId) == 0 {
+		rb.release.ReleaseId = append(rb.release.ReleaseId, ReleaseId{})
+	}
+
+	// Add the ProprietaryId to the first ReleaseId
+	rb.release.ReleaseId[0].ProprietaryId = append(rb.release.ReleaseId[0].ProprietaryId, ProprietaryId{
+		Namespace: namespace,
+		Value:     value,
+	})
+	return rb
+}
+
 // AddRelatedResource adds a related resource to the release
 func (rb *ReleaseBuilder) AddRelatedResource(relationshipType, isrc string) *ReleaseBuilder {
 	rb.release.RelatedResource = append(rb.release.RelatedResource, RelatedResource{
