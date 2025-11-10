@@ -29,7 +29,7 @@ func main() {
 		WithTitle("Video display title", "Video subtitle").
 		WithDisplayArtistName("John Doe").
 		WithArtist("PJohnDoe", "MainArtist", 1).
-		WithRightsController("PACME", 100.00).
+		WithRightsController("PACME", 100.00, []string{"Worldwide"}).
 		WithDuration("PT3M10S").
 		WithCreationDate("2023-01-01", true).
 		WithParentalWarning("NoAdviceAvailable").

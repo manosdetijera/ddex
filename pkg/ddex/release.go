@@ -26,6 +26,7 @@ type Release struct {
 	OriginalReleaseDate   []EventDateWithDefault  `xml:"OriginalReleaseDate,omitempty"`
 	DisplayGenre          []DisplayGenre          `xml:"DisplayGenre,omitempty"`
 	ParentalWarningType   string                  `xml:"ParentalWarningType,omitempty"`
+	AvRating              []AvRating              `xml:"AvRating,omitempty"`
 	RelatedResource       []RelatedResource       `xml:"RelatedResource,omitempty"`
 	ResourceGroup         []ResourceGroup         `xml:"ResourceGroup,omitempty"`
 	Keywords              []Keywords              `xml:"Keywords,omitempty"`

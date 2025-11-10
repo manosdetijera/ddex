@@ -130,3 +130,18 @@ type MarketingComment struct {
 	LanguageAndScriptCode   string   `xml:"LanguageAndScriptCode,attr,omitempty"`
 	IsDefault               bool     `xml:"IsDefault,attr,omitempty"`
 }
+
+// AvRating represents a rating for a Release
+// Following ERN 4.3 standard specification (ern:AvRating)
+type AvRating struct {
+	XMLName      xml.Name     `xml:"AvRating"`
+	RatingText   string       `xml:"RatingText,omitempty"`
+	RatingAgency RatingAgency `xml:"RatingAgency,omitempty"`
+}
+
+// RatingAgency represents the agency providing the rating
+type RatingAgency struct {
+	XMLName   xml.Name `xml:"RatingAgency"`
+	Value     string   `xml:",chardata"`
+	Namespace string   `xml:"Namespace,attr,omitempty"`
+}

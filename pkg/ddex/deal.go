@@ -32,7 +32,8 @@ type DealTerms struct {
 
 // ValidityPeriod represents time period validity information
 type ValidityPeriod struct {
-	XMLName   xml.Name `xml:"ValidityPeriod"`
-	StartDate string   `xml:"StartDate,omitempty"`
-	EndDate   string   `xml:"EndDate,omitempty"`
+	XMLName       xml.Name `xml:"ValidityPeriod"`
+	StartDate     string   `xml:"StartDate,omitempty"`
+	StartDateTime string   `xml:"StartDateTime,omitempty"`
+	EndDate       string   `xml:"EndDate,omitempty"`
 }

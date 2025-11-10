@@ -245,17 +245,26 @@ func (vb *VideoBuilder) WithContributor(partyRef string, roles []string, sequenc
 }
 
 // WithRightsController sets the rights controller
-func (vb *VideoBuilder) WithRightsController(partyRef string, percentage float64) *VideoBuilder {
+func (vb *VideoBuilder) WithRightsController(partyRef string, percentage float64, territories []string) *VideoBuilder {
+	// If no territories provided, default to Worldwide
+	if len(territories) == 0 {
+		territories = []string{"Worldwide"}
+	}
+
+	// Create a DelegatedUsageRights entry for each territory
+	delegatedRights := make([]DelegatedUsageRights, len(territories))
+	for i, territory := range territories {
+		delegatedRights[i] = DelegatedUsageRights{
+			UseType:                     []string{"UserMakeAvailableUserProvided"},
+			TerritoryOfRightsDelegation: []string{territory},
+		}
+	}
+
 	vb.video.ResourceRightsController = append(vb.video.ResourceRightsController, ResourceRightsController{
 		RightsControllerPartyReference: partyRef,
 		RightsControlType:              "RightsController",
 		RightSharePercentage:           fmt.Sprintf("%.2f", percentage),
-		DelegatedUsageRights: []DelegatedUsageRights{
-			{
-				UseType:                     []string{"UserMakeAvailableUserProvided"},
-				TerritoryOfRightsDelegation: []string{"Worldwide"},
-			},
-		},
+		DelegatedUsageRights:           delegatedRights,
 	})
 
 	return vb
@@ -538,6 +547,26 @@ func (rb *ReleaseBuilder) WithParentalWarning(warningType string) *ReleaseBuilde
 	return rb
 }
 
+// WithAvRating adds an AvRating to the release
+// Common use case for YouTube: WithAvRating("MadeForKids", "UserDefined", "YOUTUBE")
+func (rb *ReleaseBuilder) WithAvRating(ratingText, agencyValue, agencyNamespace string) *ReleaseBuilder {
+	avRating := AvRating{
+		RatingText: ratingText,
+		RatingAgency: RatingAgency{
+			Value:     agencyValue,
+			Namespace: agencyNamespace,
+		},
+	}
+
+	rb.release.AvRating = append(rb.release.AvRating, avRating)
+	return rb
+}
+
+// WithMadeForKids is a convenience method to set the YouTube MadeForKids rating
+func (rb *ReleaseBuilder) WithMadeForKids() *ReleaseBuilder {
+	return rb.WithAvRating("MadeForKids", "UserDefined", "YOUTUBE")
+}
+
 // WithMarketingComment adds a marketing comment to the release
 func (rb *ReleaseBuilder) WithMarketingComment(comment, territoryCode, languageCode string) *ReleaseBuilder {
 	commentEntry := MarketingComment{
@@ -710,7 +739,7 @@ func (db *DealBuilder) WithTerritory(territoryCode string) *DealBuilder {
 	return db
 }
 
-// WithValidityPeriod sets the deal validity period
+// WithValidityPeriod sets the deal validity period with a start date (YYYY-MM-DD)
 func (db *DealBuilder) WithValidityPeriod(startDate string) *DealBuilder {
 	if db.deal.DealTerms == nil {
 		db.deal.DealTerms = &DealTerms{}
@@ -718,6 +747,19 @@ func (db *DealBuilder) WithValidityPeriod(startDate string) *DealBuilder {
 
 	db.deal.DealTerms.ValidityPeriod = &ValidityPeriod{
 		StartDate: startDate,
+	}
+
+	return db
+}
+
+// WithValidityPeriodDateTime sets the deal validity period with a start date-time (YYYY-MM-DDTHH:MM:SS)
+func (db *DealBuilder) WithValidityPeriodDateTime(startDateTime string) *DealBuilder {
+	if db.deal.DealTerms == nil {
+		db.deal.DealTerms = &DealTerms{}
+	}
+
+	db.deal.DealTerms.ValidityPeriod = &ValidityPeriod{
+		StartDateTime: startDateTime,
 	}
 
 	return db
