@@ -251,20 +251,16 @@ func (vb *VideoBuilder) WithRightsController(partyRef string, percentage float64
 		territories = []string{"Worldwide"}
 	}
 
-	// Create a DelegatedUsageRights entry for each territory
-	delegatedRights := make([]DelegatedUsageRights, len(territories))
-	for i, territory := range territories {
-		delegatedRights[i] = DelegatedUsageRights{
-			UseType:                     []string{"UserMakeAvailableUserProvided"},
-			TerritoryOfRightsDelegation: []string{territory},
-		}
-	}
-
 	vb.video.ResourceRightsController = append(vb.video.ResourceRightsController, ResourceRightsController{
 		RightsControllerPartyReference: partyRef,
 		RightsControlType:              "RightsController",
 		RightSharePercentage:           fmt.Sprintf("%.2f", percentage),
-		DelegatedUsageRights:           delegatedRights,
+		DelegatedUsageRights: []DelegatedUsageRights{
+			{
+				UseType:                     []string{"UserMakeAvailableUserProvided"},
+				TerritoryOfRightsDelegation: territories,
+			},
+		},
 	})
 
 	return vb
