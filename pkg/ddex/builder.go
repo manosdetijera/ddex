@@ -224,18 +224,25 @@ func (vtb *VideoDetailsByTerritoryBuilder) Done() *VideoBuilder {
 	return vtb.videoBuilder
 }
 
-// WithTitle sets the video title (goes to territory details in ERN 3.8)
-func (vtb *VideoDetailsByTerritoryBuilder) WithTitle(title, subtitle, titleType string) *VideoDetailsByTerritoryBuilder {
-	// Add title to territory details
-	titleStruct := Title{
-		TitleText: title,
-		TitleType: titleType,
+// AddTitle adds the video title (goes to territory details in ERN 3.8)
+func (vtb *VideoDetailsByTerritoryBuilder) AddTitle(titleText, subtitle, languageCode, titleType string) *VideoDetailsByTerritoryBuilder {
+	title := Title{
+		TitleText: titleText,
 	}
-	if subtitle != "" {
-		titleStruct.SubTitle = subtitle
-	}
-	vtb.territoryDetails.Title = append(vtb.territoryDetails.Title, titleStruct)
 
+	if subtitle != "" {
+		title.SubTitle = subtitle
+	}
+
+	if languageCode != "" {
+		title.LanguageAndScriptCode = languageCode
+	}
+
+	if titleType != "" {
+		title.TitleType = titleType
+	}
+
+	vtb.territoryDetails.Title = append(vtb.territoryDetails.Title, title)
 	return vtb
 }
 
