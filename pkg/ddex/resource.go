@@ -173,9 +173,8 @@ type Reason struct {
 
 // Description provides textual description
 type Description struct {
-	XMLName               xml.Name `xml:"InstrumentationDescription"`
-	LanguageAndScriptCode string   `xml:"LanguageAndScriptCode,attr,omitempty"`
-	Value                 string   `xml:",chardata"`
+	LanguageAndScriptCode string `xml:"LanguageAndScriptCode,attr,omitempty"`
+	Value                 string `xml:",chardata"`
 }
 
 // RightsAgreementId identifies rights agreements
