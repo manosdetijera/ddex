@@ -87,10 +87,10 @@ func (b *Builder) WithUpdateIndicator(indicator string) *Builder {
 }
 
 // AddVideo adds a video resource
-func (b *Builder) AddVideo(resourceRef, videoType string) *VideoBuilder {
+func (b *Builder) AddVideo(resourceRef string, videoType *VideoType) *VideoBuilder {
 	video := &Video{
 		ResourceReference: resourceRef,
-		Type:              videoType,
+		VideoType:         videoType,
 	}
 
 	b.Message.ResourceList.Video = append(b.Message.ResourceList.Video, *video)
@@ -382,9 +382,10 @@ func (vtb *VideoDetailsByTerritoryBuilder) WithTechnicalDetails(techRef, fileURI
 
 // WithISRC sets the ISRC for the video in ERN 3.8 - at video level, not territory
 func (vb *VideoBuilder) WithISRC(isrc string) *VideoBuilder {
-	vb.video.VideoId = append(vb.video.VideoId, VideoId{
-		ISRC: isrc,
-	})
+	if vb.video.VideoId == nil {
+		vb.video.VideoId = &VideoId{}
+	}
+	vb.video.VideoId.ISRC = isrc
 	return vb
 }
 
@@ -401,10 +402,12 @@ func (vtb *VideoDetailsByTerritoryBuilder) AddKeywordsWithLanguage(keywords []st
 
 // AddProprietaryId adds a proprietary ID (e.g., YouTube channel ID) for ERN 3.8 - at video level
 func (vb *VideoBuilder) AddProprietaryId(namespace, value string) *VideoBuilder {
-	vb.video.VideoId = append(vb.video.VideoId, VideoId{
-		ProprietaryId: []ProprietaryId{
-			{Namespace: namespace, Value: value},
-		},
+	if vb.video.VideoId == nil {
+		vb.video.VideoId = &VideoId{}
+	}
+	vb.video.VideoId.ProprietaryId = append(vb.video.VideoId.ProprietaryId, ProprietaryId{
+		Namespace: namespace,
+		Value:     value,
 	})
 	return vb
 }

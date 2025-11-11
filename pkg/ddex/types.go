@@ -144,6 +144,12 @@ type RatingAgency struct {
 	Namespace string `xml:"Namespace,attr,omitempty"`
 }
 
+// VideoType represents the type of a video.
+type VideoType struct {
+	XMLName xml.Name `xml:"VideoType"`
+	Value   string   `xml:",chardata"`
+}
+
 // DisplayArtistName represents a display artist name with language attributes
 // Following ERN 3.8 standard specification - simpler than ERN 4.3
 type DisplayArtistName struct {

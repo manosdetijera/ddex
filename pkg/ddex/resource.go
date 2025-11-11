@@ -13,16 +13,15 @@ type ResourceList struct {
 
 // Video represents a video resource for ERN 3.8
 type Video struct {
-	XMLName                                xml.Name                                `xml:"Video"`
-	IsUpdated                              *bool                                   `xml:"IsUpdated,attr,omitempty"` // Deprecated
-	LanguageAndScriptCode                  string                                  `xml:"LanguageAndScriptCode,attr,omitempty"`
-	ResourceReference                      string                                  `xml:"ResourceReference"` // Mandatory (ID)
-	Type                                   string                                  `xml:"Type,omitempty"`    // VideoType
-	IsArtistRelated                        *bool                                   `xml:"IsArtistRelated,omitempty"`
-	VideoId                                []VideoId                               `xml:"VideoId,omitempty"`         // 0-n
-	IndirectVideoId                        []MusicalWorkId                         `xml:"IndirectVideoId,omitempty"` // 0-n
-	ResourceMusicalWorkReferenceList       *ResourceMusicalWorkReferenceList       `xml:"ResourceMusicalWorkReferenceList,omitempty"`
-	ResourceContainedResourceReferenceList *ResourceContainedResourceReferenceList `xml:"ResourceContainedResourceReferenceList,omitempty"`
+	XMLName               xml.Name `xml:"Video"`
+	IsUpdated             *bool    `xml:"IsUpdated,attr,omitempty"` // Deprecated
+	LanguageAndScriptCode string   `xml:"LanguageAndScriptCode,attr,omitempty"`
+
+	VideoType         *VideoType      `xml:"VideoType,omitempty"`
+	IsArtistRelated   *bool           `xml:"IsArtistRelated,omitempty"`
+	VideoId           *VideoId        `xml:"VideoId,omitempty"`         // 0-1
+	IndirectVideoId   []MusicalWorkId `xml:"IndirectVideoId,omitempty"` // 0-n
+	ResourceReference string          `xml:"ResourceReference"`         // Mandatory (ID)
 
 	// Choice: VideoCueSheetReference OR ReasonForCueSheetAbsence
 	VideoCueSheetReference   []VideoCueSheetReference `xml:"VideoCueSheetReference,omitempty"`   // 1-n if present
@@ -50,9 +49,11 @@ type Video struct {
 	LanguageOfDubbing     []string `xml:"LanguageOfDubbing,omitempty"`     // ISO 639-2
 	SubTitleLanguage      []string `xml:"SubTitleLanguage,omitempty"`      // ISO 639-2
 
-	Duration                     string                                 `xml:"Duration"` // Mandatory
-	RightsAgreementId            *RightsAgreementId                     `xml:"RightsAgreementId,omitempty"`
-	VideoCollectionReferenceList *SoundRecordingCollectionReferenceList `xml:"VideoCollectionReferenceList,omitempty"`
+	Duration                               string                                  `xml:"Duration"` // Mandatory
+	RightsAgreementId                      *RightsAgreementId                      `xml:"RightsAgreementId,omitempty"`
+	VideoCollectionReferenceList           *SoundRecordingCollectionReferenceList  `xml:"VideoCollectionReferenceList,omitempty"`
+	ResourceMusicalWorkReferenceList       *ResourceMusicalWorkReferenceList       `xml:"ResourceMusicalWorkReferenceList,omitempty"`
+	ResourceContainedResourceReferenceList *ResourceContainedResourceReferenceList `xml:"ResourceContainedResourceReferenceList,omitempty"`
 
 	// Date fields
 	CreationDate   *EventDate `xml:"CreationDate,omitempty"`
