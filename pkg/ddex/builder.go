@@ -768,7 +768,13 @@ func (rb *ReleaseBuilder) AddProprietaryId(namespace, value string) *ReleaseBuil
 // AddReleaseResourceReference adds a resource reference to the release
 // In ERN 3.8, this is used at the Release level to reference resources
 func (rb *ReleaseBuilder) AddReleaseResourceReference(resourceRef string) *ReleaseBuilder {
-	rb.release.ReleaseResourceReference = append(rb.release.ReleaseResourceReference, resourceRef)
+	if rb.release.ReleaseResourceReferenceList == nil {
+		rb.release.ReleaseResourceReferenceList = &ReleaseResourceReferenceList{}
+	}
+	rb.release.ReleaseResourceReferenceList.ReleaseResourceReference = append(
+		rb.release.ReleaseResourceReferenceList.ReleaseResourceReference,
+		resourceRef,
+	)
 	return rb
 }
 

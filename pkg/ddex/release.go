@@ -11,24 +11,41 @@ type ReleaseList struct {
 // Release represents a single release for ERN 3.8
 // Following ERN 3.8 specification with mandatory ReferenceTitle and ReleaseDetailsByTerritory
 type Release struct {
-	XMLName                   xml.Name                    `xml:"Release"`
-	LanguageAndScriptCode     string                      `xml:"LanguageAndScriptCode,attr,omitempty"`
-	IsMainRelease             bool                        `xml:"IsMainRelease,attr,omitempty"`
-	ReleaseReference          string                      `xml:"ReleaseReference,omitempty"`
-	ReleaseId                 []ReleaseId                 `xml:"ReleaseId"`
-	ExternalResourceLink      []ExternalResourceLink      `xml:"ExternalResourceLink,omitempty"`
-	ReferenceTitle            *ReferenceTitle             `xml:"ReferenceTitle"`
-	ReleaseResourceReference  []string                    `xml:"ReleaseResourceReference,omitempty"`
-	ReleaseType               []ReleaseType               `xml:"ReleaseType,omitempty"`
-	ReleaseDetailsByTerritory []ReleaseDetailsByTerritory `xml:"ReleaseDetailsByTerritory"`
-	LanguageOfPerformance     []string                    `xml:"LanguageOfPerformance,omitempty"`
-	LanguageOfDubbing         []string                    `xml:"LanguageOfDubbing,omitempty"`
-	SubTitleLanguage          []string                    `xml:"SubTitleLanguage,omitempty"`
-	Duration                  string                      `xml:"Duration,omitempty"`
-	PLine                     []PLine                     `xml:"PLine,omitempty"`
-	CLine                     []CLine                     `xml:"CLine,omitempty"`
-	GlobalReleaseDate         *EventDate                  `xml:"GlobalReleaseDate,omitempty"`
-	GlobalOriginalReleaseDate *EventDate                  `xml:"GlobalOriginalReleaseDate,omitempty"`
+	XMLName                        xml.Name                        `xml:"Release"`
+	LanguageAndScriptCode          string                          `xml:"LanguageAndScriptCode,attr,omitempty"`
+	IsMainRelease                  bool                            `xml:"IsMainRelease,attr,omitempty"`
+	ReleaseReference               string                          `xml:"ReleaseReference,omitempty"`               // Mandatory (ID)
+	ReleaseId                      []ReleaseId                     `xml:"ReleaseId"`                                // 1-n
+	DisplayTitleText               []DisplayTitleText              `xml:"DisplayTitleText,omitempty"`               // 0-n
+	DisplayTitle                   []DisplayTitle                  `xml:"DisplayTitle,omitempty"`                   // 0-n
+	AdditionalTitle                []AdditionalTitle               `xml:"AdditionalTitle,omitempty"`                // 0-n
+	ExternalResourceLink           []ExternalResourceLink          `xml:"ExternalResourceLink,omitempty"`           // 0-n
+	ReferenceTitle                 *ReferenceTitle                 `xml:"ReferenceTitle"`                           // Mandatory (1)
+	ReleaseResourceReferenceList   *ReleaseResourceReferenceList   `xml:"ReleaseResourceReferenceList,omitempty"`   // 0-1
+	ReleaseCollectionReferenceList *ReleaseCollectionReferenceList `xml:"ReleaseCollectionReferenceList,omitempty"` // 0-1
+	IsCompilation                  *bool                           `xml:"IsCompilation,omitempty"`                  // 0-1
+	ReleaseType                    []ReleaseType                   `xml:"ReleaseType,omitempty"`                    // 0-n
+	ReleaseDetailsByTerritory      []ReleaseDetailsByTerritory     `xml:"ReleaseDetailsByTerritory"`                // 1-n (Mandatory)
+	LanguageOfPerformance          []string                        `xml:"LanguageOfPerformance,omitempty"`          // 0-n
+	LanguageOfDubbing              []string                        `xml:"LanguageOfDubbing,omitempty"`              // 0-n
+	SubTitleLanguage               []string                        `xml:"SubTitleLanguage,omitempty"`               // 0-n
+	Duration                       string                          `xml:"Duration,omitempty"`                       // 0-1
+	PLine                          []PLine                         `xml:"PLine,omitempty"`                          // 0-n
+	CLine                          []CLine                         `xml:"CLine,omitempty"`                          // 0-n
+	GlobalReleaseDate              *EventDate                      `xml:"GlobalReleaseDate,omitempty"`              // 0-1
+	GlobalOriginalReleaseDate      *EventDate                      `xml:"GlobalOriginalReleaseDate,omitempty"`      // 0-1
+}
+
+// ReleaseResourceReferenceList represents a list of resource references
+type ReleaseResourceReferenceList struct {
+	XMLName                  xml.Name `xml:"ReleaseResourceReferenceList"`
+	ReleaseResourceReference []string `xml:"ReleaseResourceReference"`
+}
+
+// ReleaseCollectionReferenceList represents a list of collection references
+type ReleaseCollectionReferenceList struct {
+	XMLName                    xml.Name `xml:"ReleaseCollectionReferenceList"`
+	ReleaseCollectionReference []string `xml:"ReleaseCollectionReference"`
 }
 
 // ReferenceTitle represents the reference title of a release (mandatory in ERN 3.8)
