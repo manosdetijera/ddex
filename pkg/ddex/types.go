@@ -133,9 +133,15 @@ type MarketingComment struct {
 // AvRating represents an audio-visual rating for a Release
 // Following ERN 3.8 standard specification
 type AvRating struct {
-	XMLName      xml.Name `xml:"AvRating"`
-	RatingText   string   `xml:"RatingText,omitempty"`
-	RatingAgency string   `xml:"RatingAgency,omitempty"`
+	XMLName      xml.Name      `xml:"AvRating"`
+	RatingText   string        `xml:"RatingText,omitempty"`
+	RatingAgency *RatingAgency `xml:"RatingAgency,omitempty"`
+}
+
+// RatingAgency represents a rating agency with optional namespace
+type RatingAgency struct {
+	Value     string `xml:",chardata"`
+	Namespace string `xml:"Namespace,attr,omitempty"`
 }
 
 // DisplayArtistName represents a display artist name with language attributes

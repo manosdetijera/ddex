@@ -676,18 +676,16 @@ func (rtb *ReleaseDetailsByTerritoryBuilder) WithParentalWarning(warningType str
 }
 
 // WithAvRating adds an AvRating for the current territory
-func (rtb *ReleaseDetailsByTerritoryBuilder) WithAvRating(ratingText, agencyValue string) *ReleaseDetailsByTerritoryBuilder {
+func (rtb *ReleaseDetailsByTerritoryBuilder) WithAvRating(ratingText, agencyValue, agencyNamespace string) *ReleaseDetailsByTerritoryBuilder {
 	avRating := AvRating{
-		RatingText:   ratingText,
-		RatingAgency: agencyValue,
+		RatingText: ratingText,
+		RatingAgency: &RatingAgency{
+			Value:     agencyValue,
+			Namespace: agencyNamespace,
+		},
 	}
 	rtb.territoryDetails.AvRating = append(rtb.territoryDetails.AvRating, avRating)
 	return rtb
-}
-
-// WithMadeForKids is a convenience method to set the YouTube MadeForKids rating
-func (rtb *ReleaseDetailsByTerritoryBuilder) WithMadeForKids() *ReleaseDetailsByTerritoryBuilder {
-	return rtb.WithAvRating("MadeForKids", "UserDefined")
 }
 
 // WithMarketingComment adds a marketing comment for the current territory
