@@ -259,14 +259,15 @@ func (vtb *VideoDetailsByTerritoryBuilder) WithDisplayArtistName(artistName, lan
 }
 
 // WithArtist adds a display artist reference to the video (territory specific)
-func (vtb *VideoDetailsByTerritoryBuilder) WithArtist(partyRef, role string, sequence int) *VideoDetailsByTerritoryBuilder {
-	if partyRef != "" {
-		vtb.territoryDetails.DisplayArtist = append(vtb.territoryDetails.DisplayArtist, DisplayArtist{
-			ArtistPartyReference: partyRef,
-			DisplayArtistRole:    role,
-			SequenceNumber:       sequence,
-		})
+func (vtb *VideoDetailsByTerritoryBuilder) WithArtist(artistName string, roles []string, sequence int) *VideoDetailsByTerritoryBuilder {
+	artist := DisplayArtist{
+		SequenceNumber: sequence,
+		PartyName: []PartyName{
+			{FullName: artistName},
+		},
+		ArtistRole: roles,
 	}
+	vtb.territoryDetails.DisplayArtist = append(vtb.territoryDetails.DisplayArtist, artist)
 
 	return vtb
 }
@@ -284,13 +285,16 @@ func (vtb *VideoDetailsByTerritoryBuilder) WithLabel(labelName, labelNameType, l
 	return vtb
 }
 
-// WithContributor adds a contributor to the video resource (territory specific)
+// WithResourceContributor adds a contributor to the video resource (territory specific)
 // role can be multiple values like "Producer", "Director", "Cinematographer", etc.
-func (vtb *VideoDetailsByTerritoryBuilder) WithContributor(partyRef string, roles []string, sequence int) *VideoDetailsByTerritoryBuilder {
-	if partyRef != "" && len(roles) > 0 {
+func (vtb *VideoDetailsByTerritoryBuilder) WithResourceContributor(partyName string, roles []string, sequence int) *VideoDetailsByTerritoryBuilder {
+	if partyName != "" && len(roles) > 0 {
 		vtb.territoryDetails.ResourceContributor = append(vtb.territoryDetails.ResourceContributor, ResourceContributor{
-			PartyReference: partyRef,
-			Role:           roles,
+			SequenceNumber: sequence,
+			PartyName: []PartyName{
+				{FullName: partyName},
+			},
+			ResourceContributorRole: roles,
 		})
 	}
 
@@ -594,14 +598,15 @@ func (rtb *ReleaseDetailsByTerritoryBuilder) WithDisplayArtistName(artistName, l
 }
 
 // WithArtist adds a display artist reference for the current territory
-func (rtb *ReleaseDetailsByTerritoryBuilder) WithArtist(partyRef, role string, sequence int) *ReleaseDetailsByTerritoryBuilder {
-	if partyRef != "" {
-		rtb.territoryDetails.DisplayArtist = append(rtb.territoryDetails.DisplayArtist, DisplayArtist{
-			ArtistPartyReference: partyRef,
-			DisplayArtistRole:    role,
-			SequenceNumber:       sequence,
-		})
+func (rtb *ReleaseDetailsByTerritoryBuilder) WithArtist(artistName string, roles []string, sequence int) *ReleaseDetailsByTerritoryBuilder {
+	artist := DisplayArtist{
+		SequenceNumber: sequence,
+		PartyName: []PartyName{
+			{FullName: artistName},
+		},
+		ArtistRole: roles,
 	}
+	rtb.territoryDetails.DisplayArtist = append(rtb.territoryDetails.DisplayArtist, artist)
 	return rtb
 }
 

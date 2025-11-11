@@ -160,19 +160,23 @@ type DisplayArtistName struct {
 
 // ResourceContributor represents a contributor to a resource (ERN 3.8)
 type ResourceContributor struct {
-	XMLName                       xml.Name `xml:"ResourceContributor"`
-	PartyReference                string   `xml:"ResourceContributorPartyReference"`
-	Role                          []string `xml:"ResourceContributorRole,omitempty"`
-	InstrumentType                []string `xml:"InstrumentType,omitempty"`
-	HasMadeFeaturedContribution   *bool    `xml:"HasMadeFeaturedContribution,omitempty"`
-	HasMadeContractedContribution *bool    `xml:"HasMadeContractedContribution,omitempty"`
+	XMLName                       xml.Name    `xml:"ResourceContributor"`
+	SequenceNumber                int         `xml:"SequenceNumber,attr,omitempty"`
+	PartyId                       []PartyId   `xml:"PartyId,omitempty"`
+	PartyName                     []PartyName `xml:"PartyName,omitempty"`
+	ResourceContributorRole       []string    `xml:"ResourceContributorRole,omitempty"`
+	InstrumentType                []string    `xml:"InstrumentType,omitempty"`
+	HasMadeFeaturedContribution   *bool       `xml:"HasMadeFeaturedContribution,omitempty"`
+	HasMadeContractedContribution *bool       `xml:"HasMadeContractedContribution,omitempty"`
 }
 
 // IndirectResourceContributor represents an indirect contributor (ERN 3.8)
 type IndirectResourceContributor struct {
-	XMLName        xml.Name `xml:"IndirectResourceContributor"`
-	PartyReference string   `xml:"IndirectResourceContributorPartyReference"`
-	Role           []string `xml:"IndirectResourceContributorRole,omitempty"`
+	XMLName                         xml.Name    `xml:"IndirectResourceContributor"`
+	SequenceNumber                  int         `xml:"SequenceNumber,attr,omitempty"`
+	PartyName                       []PartyName `xml:"PartyName,omitempty"`
+	PartyId                         []PartyId   `xml:"PartyId,omitempty"`
+	IndirectResourceContributorRole []string    `xml:"IndirectResourceContributorRole,omitempty"`
 }
 
 // RightsController represents a rights controller (TypedRightsController in ERN 3.8)

@@ -32,20 +32,11 @@ type PartyName struct {
 
 // DisplayArtist represents how an artist should be displayed
 type DisplayArtist struct {
-	XMLName                 xml.Name                  `xml:"DisplayArtist"`
-	SequenceNumber          int                       `xml:"SequenceNumber,attr,omitempty"`
-	ArtistPartyReference    string                    `xml:"ArtistPartyReference"`
-	DisplayArtistRole       string                    `xml:"DisplayArtistRole"`
-	ArtisticRole            []string                  `xml:"ArtisticRole,omitempty"`
-	TitleDisplayInformation []TitleDisplayInformation `xml:"TitleDisplayInformation,omitempty"`
-}
-
-// TitleDisplayInformation represents how artist info should be displayed in titles
-type TitleDisplayInformation struct {
-	XMLName            xml.Name `xml:"TitleDisplayInformation"`
-	IsDisplayedInTitle bool     `xml:"IsDisplayedInTitle"`
-	Prefix             string   `xml:"Prefix,omitempty"`
-	Suffix             string   `xml:"Suffix,omitempty"`
+	XMLName        xml.Name    `xml:"DisplayArtist"`
+	SequenceNumber int         `xml:"SequenceNumber,attr,omitempty"`
+	PartyName      []PartyName `xml:"PartyName,omitempty"`
+	PartyId        []PartyId   `xml:"PartyId,omitempty"`
+	ArtistRole     []string    `xml:"ArtistRole,omitempty"`
 }
 
 // Location represents location information for a party
