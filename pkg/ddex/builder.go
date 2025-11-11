@@ -835,14 +835,15 @@ func (rtb *ReleaseDetailsByTerritoryBuilder) AddRelatedRelease(relationshipType 
 }
 
 // AddResourceGroup adds a resource group to the current territory
-func (rtb *ReleaseDetailsByTerritoryBuilder) AddResourceGroup(titleText string, sequenceNumber int) *ResourceGroupBuilder {
+func (rtb *ReleaseDetailsByTerritoryBuilder) AddResourceGroup(titleText, titleType string, sequenceNumber int) *ResourceGroupBuilder {
 	group := ResourceGroup{
 		SequenceNumber: sequenceNumber,
 	}
 
 	if titleText != "" {
-		group.AdditionalTitle = AdditionalTitle{
+		group.Title = Title{
 			TitleText: titleText,
+			TitleType: titleType,
 		}
 	}
 

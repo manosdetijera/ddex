@@ -168,7 +168,7 @@ type CatalogNumber struct {
 // ResourceGroup represents a grouping of resources within a release
 type ResourceGroup struct {
 	XMLName                  xml.Name                   `xml:"ResourceGroup"`
-	AdditionalTitle          AdditionalTitle            `xml:"AdditionalTitle,omitempty"`
+	Title                    Title                      `xml:"Title,omitempty"`
 	SequenceNumber           int                        `xml:"SequenceNumber,omitempty"`
 	ResourceGroupContentItem []ResourceGroupContentItem `xml:"ResourceGroupContentItem"`
 }
