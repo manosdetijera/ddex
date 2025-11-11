@@ -358,12 +358,9 @@ func (vtb *VideoDetailsByTerritoryBuilder) WithCLine(year int, text string) *Vid
 }
 
 // WithGenre adds genre information (territory specific)
-func (vtb *VideoDetailsByTerritoryBuilder) WithGenre(genreText, subGenre string) *VideoDetailsByTerritoryBuilder {
+func (vtb *VideoDetailsByTerritoryBuilder) WithGenre(genreText string) *VideoDetailsByTerritoryBuilder {
 	genre := Genre{
 		GenreText: genreText,
-	}
-	if subGenre != "" {
-		genre.SubGenre = subGenre
 	}
 	vtb.territoryDetails.Genre = append(vtb.territoryDetails.Genre, genre)
 	return vtb

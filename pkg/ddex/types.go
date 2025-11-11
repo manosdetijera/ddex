@@ -179,8 +179,8 @@ type IndirectResourceContributor struct {
 type RightsController struct {
 	XMLName                        xml.Name  `xml:"RightsController"`
 	SequenceNumber                 *int      `xml:"SequenceNumber,omitempty"`
-	PartyId                        []PartyID `xml:"PartyId,omitempty"`
 	PartyName                      []Name    `xml:"PartyName,omitempty"`
+	PartyId                        []PartyID `xml:"PartyId,omitempty"`
 	RightsControllerPartyReference string    `xml:"RightsControllerPartyReference,omitempty"`
 	RightsControllerRole           []string  `xml:"RightsControllerRole,omitempty"`
 	RightSharePercentage           string    `xml:"RightSharePercentage,omitempty"`
