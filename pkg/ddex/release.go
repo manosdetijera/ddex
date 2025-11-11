@@ -87,6 +87,7 @@ type LabelName struct {
 // Title represents a title (different from DisplayTitle)
 type Title struct {
 	XMLName   xml.Name `xml:"Title"`
+	TitleType string   `xml:"TitleType,attr,omitempty"`
 	TitleText string   `xml:"TitleText"`
 	SubTitle  string   `xml:"SubTitle,omitempty"`
 }

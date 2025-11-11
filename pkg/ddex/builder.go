@@ -226,10 +226,11 @@ func (vtb *VideoDetailsByTerritoryBuilder) Done() *VideoBuilder {
 }
 
 // WithTitle sets the video title (goes to territory details in ERN 3.8)
-func (vtb *VideoDetailsByTerritoryBuilder) WithTitle(title, subtitle string) *VideoDetailsByTerritoryBuilder {
+func (vtb *VideoDetailsByTerritoryBuilder) WithTitle(title, subtitle, titleType string) *VideoDetailsByTerritoryBuilder {
 	// Add title to territory details
 	titleStruct := Title{
 		TitleText: title,
+		TitleType: titleType,
 	}
 	if subtitle != "" {
 		titleStruct.SubTitle = subtitle
@@ -314,6 +315,15 @@ func (vb *VideoBuilder) WithCreationDate(date string, isApproximate bool) *Video
 	return vb
 }
 
+// WithReferenceTitle sets the reference title for the video - at video level, not territory
+func (vb *VideoBuilder) WithReferenceTitle(titleText, subtitle string) *VideoBuilder {
+	vb.video.ReferenceTitle = &ReferenceTitle{
+		TitleText: titleText,
+		SubTitle:  subtitle,
+	}
+	return vb
+}
+
 // WithParentalWarning sets the parental warning type (territory specific)
 func (vtb *VideoDetailsByTerritoryBuilder) WithParentalWarning(warningType string) *VideoDetailsByTerritoryBuilder {
 	vtb.territoryDetails.ParentalWarningType = append(vtb.territoryDetails.ParentalWarningType, warningType)
@@ -370,7 +380,7 @@ func (vb *VideoBuilder) WithISRC(isrc string) *VideoBuilder {
 }
 
 // AddKeywords adds keywords for enhanced search and display (ERN 3.8 - territory specific)
-func (vtb *VideoDetailsByTerritoryBuilder) AddKeywords(keywords ...string) *VideoDetailsByTerritoryBuilder {
+func (vtb *VideoDetailsByTerritoryBuilder) AddKeywords(keywords []string) *VideoDetailsByTerritoryBuilder {
 	for _, keyword := range keywords {
 		vtb.territoryDetails.Keywords = append(vtb.territoryDetails.Keywords, Keywords{
 			Value: keyword,
@@ -380,7 +390,7 @@ func (vtb *VideoDetailsByTerritoryBuilder) AddKeywords(keywords ...string) *Vide
 }
 
 // AddKeywordsWithLanguage adds keywords with specific language (ERN 3.8 - territory specific)
-func (vtb *VideoDetailsByTerritoryBuilder) AddKeywordsWithLanguage(languageCode string, keywords ...string) *VideoDetailsByTerritoryBuilder {
+func (vtb *VideoDetailsByTerritoryBuilder) AddKeywordsWithLanguage(languageCode string, keywords []string) *VideoDetailsByTerritoryBuilder {
 	for _, keyword := range keywords {
 		vtb.territoryDetails.Keywords = append(vtb.territoryDetails.Keywords, Keywords{
 			Value:                 keyword,
