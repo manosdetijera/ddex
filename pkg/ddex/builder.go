@@ -87,10 +87,10 @@ func (b *Builder) WithUpdateIndicator(indicator string) *Builder {
 }
 
 // AddVideo adds a video resource
-func (b *Builder) AddVideo(resourceRef string, videoType *VideoType) *VideoBuilder {
+func (b *Builder) AddVideo(resourceRef, videoType string) *VideoBuilder {
 	video := &Video{
 		ResourceReference: resourceRef,
-		VideoType:         videoType,
+		VideoType:         &VideoType{Value: videoType},
 	}
 
 	b.Message.ResourceList.Video = append(b.Message.ResourceList.Video, *video)
