@@ -171,12 +171,14 @@ type IndirectResourceContributor struct {
 
 // RightsController represents a rights controller (TypedRightsController in ERN 3.8)
 type RightsController struct {
-	XMLName              xml.Name               `xml:"RightsController"`
-	PartyReference       string                 `xml:"RightsControllerPartyReference"`
-	Role                 []string               `xml:"RightsControllerRole,omitempty"`
-	RightSharePercentage string                 `xml:"RightSharePercentage,omitempty"`
-	RightShareUnknown    string                 `xml:"RightShareUnknown,omitempty"`
-	DelegatedUsageRights []DelegatedUsageRights `xml:"DelegatedUsageRights,omitempty"`
+	XMLName                        xml.Name  `xml:"RightsController"`
+	SequenceNumber                 *int      `xml:"SequenceNumber,omitempty"`
+	PartyId                        []PartyID `xml:"PartyId,omitempty"`
+	PartyName                      []Name    `xml:"PartyName,omitempty"`
+	RightsControllerPartyReference string    `xml:"RightsControllerPartyReference,omitempty"`
+	RightsControllerRole           []string  `xml:"RightsControllerRole,omitempty"`
+	RightSharePercentage           string    `xml:"RightSharePercentage,omitempty"`
+	RightShareUnknown              string    `xml:"RightShareUnknown,omitempty"`
 }
 
 // HostSoundCarrier represents the sound carrier on which a resource was originally released (ERN 3.8)

@@ -265,6 +265,19 @@ func (vtb *VideoDetailsByTerritoryBuilder) WithArtist(partyRef, role string, seq
 	return vtb
 }
 
+// WithLabel adds a label name for the video (territory specific)
+func (vtb *VideoDetailsByTerritoryBuilder) WithLabel(labelName, labelNameType, languageCode string) *VideoDetailsByTerritoryBuilder {
+	if languageCode == "" {
+		languageCode = "en"
+	}
+	vtb.territoryDetails.LabelName = append(vtb.territoryDetails.LabelName, LabelName{
+		Value:                 labelName,
+		LabelNameType:         labelNameType,
+		LanguageAndScriptCode: languageCode,
+	})
+	return vtb
+}
+
 // WithContributor adds a contributor to the video resource (territory specific)
 // role can be multiple values like "Producer", "Director", "Cinematographer", etc.
 func (vtb *VideoDetailsByTerritoryBuilder) WithContributor(partyRef string, roles []string, sequence int) *VideoDetailsByTerritoryBuilder {
@@ -279,23 +292,20 @@ func (vtb *VideoDetailsByTerritoryBuilder) WithContributor(partyRef string, role
 }
 
 // WithRightsController sets the rights controller (territory specific)
-func (vtb *VideoDetailsByTerritoryBuilder) WithRightsController(partyRef string, percentage float64, territories []string) *VideoDetailsByTerritoryBuilder {
-	// If no territories provided, default to Worldwide
-	if len(territories) == 0 {
-		territories = []string{"Worldwide"}
+// Parameters: partyName, partyId, and percentage
+func (vtb *VideoDetailsByTerritoryBuilder) WithRightsController(partyName, partyId string, percentage float64) *VideoDetailsByTerritoryBuilder {
+	rightsController := RightsController{
+		PartyName: []Name{
+			{FullName: partyName},
+		},
+		PartyId: []PartyID{
+			{Value: partyId},
+		},
+		RightsControllerRole: []string{"RightsController"},
+		RightSharePercentage: fmt.Sprintf("%.2f", percentage),
 	}
 
-	vtb.territoryDetails.RightsController = append(vtb.territoryDetails.RightsController, RightsController{
-		PartyReference:       partyRef,
-		Role:                 []string{"RightsController"},
-		RightSharePercentage: fmt.Sprintf("%.2f", percentage),
-		DelegatedUsageRights: []DelegatedUsageRights{
-			{
-				UseType:                     []string{"UserMakeAvailableUserProvided"},
-				TerritoryOfRightsDelegation: territories,
-			},
-		},
-	})
+	vtb.territoryDetails.RightsController = append(vtb.territoryDetails.RightsController, rightsController)
 
 	return vtb
 }

@@ -80,6 +80,7 @@ type ReleaseDetailsByTerritory struct {
 // LabelName represents the label name
 type LabelName struct {
 	XMLName               xml.Name `xml:"LabelName"`
+	LabelNameType         string   `xml:"LabelNameType,attr,omitempty"`
 	Value                 string   `xml:",chardata"`
 	LanguageAndScriptCode string   `xml:"LanguageAndScriptCode,attr,omitempty"`
 }
