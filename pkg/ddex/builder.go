@@ -379,18 +379,8 @@ func (vb *VideoBuilder) WithISRC(isrc string) *VideoBuilder {
 	return vb
 }
 
-// AddKeywords adds keywords for enhanced search and display (ERN 3.8 - territory specific)
-func (vtb *VideoDetailsByTerritoryBuilder) AddKeywords(keywords []string) *VideoDetailsByTerritoryBuilder {
-	for _, keyword := range keywords {
-		vtb.territoryDetails.Keywords = append(vtb.territoryDetails.Keywords, Keywords{
-			Value: keyword,
-		})
-	}
-	return vtb
-}
-
 // AddKeywordsWithLanguage adds keywords with specific language (ERN 3.8 - territory specific)
-func (vtb *VideoDetailsByTerritoryBuilder) AddKeywordsWithLanguage(languageCode string, keywords []string) *VideoDetailsByTerritoryBuilder {
+func (vtb *VideoDetailsByTerritoryBuilder) AddKeywordsWithLanguage(keywords []string, languageCode string) *VideoDetailsByTerritoryBuilder {
 	for _, keyword := range keywords {
 		vtb.territoryDetails.Keywords = append(vtb.territoryDetails.Keywords, Keywords{
 			Value:                 keyword,
@@ -710,16 +700,18 @@ func (rtb *ReleaseDetailsByTerritoryBuilder) WithMarketingComment(comment, langu
 	return rtb
 }
 
-// WithKeywords adds keywords for the current territory
-func (rtb *ReleaseDetailsByTerritoryBuilder) WithKeywords(keywords, languageCode string) *ReleaseDetailsByTerritoryBuilder {
+// AddKeywordsWithLanguage adds keywords with specific language for the current territory
+func (rtb *ReleaseDetailsByTerritoryBuilder) AddKeywordsWithLanguage(keywords []string, languageCode string) *ReleaseDetailsByTerritoryBuilder {
 	if languageCode == "" {
 		languageCode = "en"
 	}
-	keywordsEntry := Keywords{
-		Value:                 keywords,
-		LanguageAndScriptCode: languageCode,
+	for _, keyword := range keywords {
+		keywordsEntry := Keywords{
+			Value:                 keyword,
+			LanguageAndScriptCode: languageCode,
+		}
+		rtb.territoryDetails.Keywords = append(rtb.territoryDetails.Keywords, keywordsEntry)
 	}
-	rtb.territoryDetails.Keywords = append(rtb.territoryDetails.Keywords, keywordsEntry)
 	return rtb
 }
 
