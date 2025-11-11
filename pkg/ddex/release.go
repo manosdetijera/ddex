@@ -38,8 +38,14 @@ type Release struct {
 
 // ReleaseResourceReferenceList represents a list of resource references
 type ReleaseResourceReferenceList struct {
-	XMLName                  xml.Name `xml:"ReleaseResourceReferenceList"`
-	ReleaseResourceReference []string `xml:"ReleaseResourceReference"`
+	XMLName                  xml.Name                   `xml:"ReleaseResourceReferenceList"`
+	ReleaseResourceReference []ReleaseResourceReference `xml:"ReleaseResourceReference"`
+}
+
+// ReleaseResourceReference represents a single resource reference with its type
+type ReleaseResourceReference struct {
+	ReleaseResourceType string `xml:"ReleaseResourceType,attr,omitempty"`
+	Value               string `xml:",chardata"`
 }
 
 // ReleaseCollectionReferenceList represents a list of collection references
