@@ -14,8 +14,8 @@ type Release struct {
 	XMLName                        xml.Name                        `xml:"Release"`
 	LanguageAndScriptCode          string                          `xml:"LanguageAndScriptCode,attr,omitempty"`
 	IsMainRelease                  bool                            `xml:"IsMainRelease,attr,omitempty"`
-	ReleaseReference               string                          `xml:"ReleaseReference,omitempty"`               // Mandatory (ID)
 	ReleaseId                      []ReleaseId                     `xml:"ReleaseId"`                                // 1-n
+	ReleaseReference               string                          `xml:"ReleaseReference,omitempty"`               // Mandatory (ID)
 	DisplayTitleText               []DisplayTitleText              `xml:"DisplayTitleText,omitempty"`               // 0-n
 	DisplayTitle                   []DisplayTitle                  `xml:"DisplayTitle,omitempty"`                   // 0-n
 	AdditionalTitle                []AdditionalTitle               `xml:"AdditionalTitle,omitempty"`                // 0-n

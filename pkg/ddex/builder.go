@@ -541,6 +541,12 @@ func (rb *ReleaseBuilder) WithTitle(title, subtitle string) *ReleaseBuilder {
 	return rb
 }
 
+// SetMainRelease sets whether this release is the main release
+func (rb *ReleaseBuilder) SetMainRelease(isMain bool) *ReleaseBuilder {
+	rb.release.IsMainRelease = isMain
+	return rb
+}
+
 // AddReleaseDetailsByTerritory creates a new territory details section and returns a builder for it
 // This is mandatory in ERN 3.8 - at least one territory must be specified
 func (rb *ReleaseBuilder) AddReleaseDetailsByTerritory(territoryCodes []string) *ReleaseDetailsByTerritoryBuilder {
