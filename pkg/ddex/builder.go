@@ -238,9 +238,9 @@ func (vb *VideoBuilder) WithArtist(partyRef, role string, sequence int) *VideoBu
 func (vb *VideoBuilder) WithContributor(partyRef string, roles []string, sequence int) *VideoBuilder {
 	if partyRef != "" && len(roles) > 0 {
 		vb.video.Contributor = append(vb.video.Contributor, Contributor{
-			PartyReference: partyRef,
-			Role:           roles,
-			SequenceNumber: sequence,
+			ContributorPartyReference: partyRef,
+			Role:                      roles,
+			SequenceNumber:            sequence,
 		})
 	}
 
@@ -610,34 +610,11 @@ func (rb *ReleaseBuilder) WithContainsAI(containsAI string) *ReleaseBuilder {
 	return rb
 }
 
-// WithUPC sets the UPC identifier for the release
-func (rb *ReleaseBuilder) WithUPC(upc string) *ReleaseBuilder {
-	rb.release.ReleaseId = append(rb.release.ReleaseId, ReleaseId{
-		ICPN: &ICPN{
-			Value: upc,
-			IsEan: false,
-		},
-	})
-	return rb
-}
-
-// WithEAN sets the EAN identifier for the release
-func (rb *ReleaseBuilder) WithEAN(ean string) *ReleaseBuilder {
-	rb.release.ReleaseId = append(rb.release.ReleaseId, ReleaseId{
-		ICPN: &ICPN{
-			Value: ean,
-			IsEan: true,
-		},
-	})
-	return rb
-}
-
-// WithICPN sets a generic ICPN identifier (use WithUPC or WithEAN for better clarity)
+// WithICPN sets the ICPN identifier for the release
 func (rb *ReleaseBuilder) WithICPN(icpn string) *ReleaseBuilder {
 	rb.release.ReleaseId = append(rb.release.ReleaseId, ReleaseId{
 		ICPN: &ICPN{
 			Value: icpn,
-			IsEan: false, // Default to UPC format
 		},
 	})
 	return rb

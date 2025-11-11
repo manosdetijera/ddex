@@ -161,8 +161,8 @@ type DisplayGenre struct {
 }
 
 type Contributor struct {
-	XMLName        xml.Name `xml:"Contributor"`
-	SequenceNumber int      `xml:"SequenceNumber,attr,omitempty"`
-	PartyReference string   `xml:"PartyReference"`
-	Role           []string `xml:"Role"`
+	XMLName                   xml.Name `xml:"Contributor"`
+	SequenceNumber            int      `xml:"SequenceNumber,attr,omitempty"`
+	ContributorPartyReference string   `xml:"ContributorPartyReference"`
+	Role                      []string `xml:"Role"`
 }

@@ -56,11 +56,10 @@ type ReleaseId struct {
 	ProprietaryId []ProprietaryId `xml:"ProprietaryId,omitempty"`
 }
 
-// ICPN represents UPC/EAN identifiers with proper IsEan attribute
+// ICPN represents UPC/EAN identifiers
 type ICPN struct {
 	XMLName xml.Name `xml:"ICPN"`
 	Value   string   `xml:",chardata"`
-	IsEan   bool     `xml:"IsEan,attr"`
 }
 
 // ReleaseLabelReference represents a reference to a label party
