@@ -212,8 +212,11 @@ func (vb *VideoBuilder) WithTitle(title, subtitle string) *VideoBuilder {
 }
 
 // WithDisplayArtistName sets the display artist name for the video
-func (vb *VideoBuilder) WithDisplayArtistName(artistName string) *VideoBuilder {
-	vb.video.DisplayArtistName = []string{artistName}
+func (vb *VideoBuilder) WithDisplayArtistName(artistName, territoryCode string) *VideoBuilder {
+	vb.video.DisplayArtistName = append(vb.video.DisplayArtistName, DisplayArtistNameWithOriginalLanguage{
+		Value:                   artistName,
+		ApplicableTerritoryCode: territoryCode,
+	})
 	return vb
 }
 
@@ -450,8 +453,11 @@ func (rb *ReleaseBuilder) WithTitle(title, subtitle string) *ReleaseBuilder {
 }
 
 // WithDisplayArtistName sets the display artist name for the release
-func (rb *ReleaseBuilder) WithDisplayArtistName(artistName string) *ReleaseBuilder {
-	rb.release.DisplayArtistName = []string{artistName}
+func (rb *ReleaseBuilder) WithDisplayArtistName(artistName, territoryCode string) *ReleaseBuilder {
+	rb.release.DisplayArtistName = append(rb.release.DisplayArtistName, DisplayArtistNameWithOriginalLanguage{
+		Value:                   artistName,
+		ApplicableTerritoryCode: territoryCode,
+	})
 	return rb
 }
 

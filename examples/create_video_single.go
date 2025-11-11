@@ -27,7 +27,7 @@ func main() {
 	builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
 		WithISRC("QZ6GL1732999").
 		WithTitle("Video display title", "Video subtitle").
-		WithDisplayArtistName("John Doe").
+		WithDisplayArtistName("John Doe", "Worldwide").
 		WithArtist("PJohnDoe", "MainArtist", 1).
 		WithRightsController("PACME", 100.00, []string{"Worldwide"}).
 		WithDuration("PT3M10S").
@@ -50,7 +50,7 @@ func main() {
 	builder.AddRelease("R0", "VideoSingle").
 		WithICPN("2023121700021").
 		WithTitle("Video display title", "Video").
-		WithDisplayArtistName("John Doe").
+		WithDisplayArtistName("John Doe", "Worldwide").
 		WithArtist("PJohnDoe", "MainArtist", 1).
 		WithLabel("PACME", "Worldwide").
 		WithPLine(2023, "(P) 2023 Some Pline text").

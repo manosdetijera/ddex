@@ -15,7 +15,7 @@
                 <FullName>YouTube</FullName>
             </PartyName>
         </MessageRecipient>
-        <MessageCreatedDateTime>2025-11-09T22:43:22-06:00</MessageCreatedDateTime>
+        <MessageCreatedDateTime>2025-11-10T18:03:50-06:00</MessageCreatedDateTime>
     </MessageHeader>
     <PartyList>
         <Party>
@@ -62,7 +62,7 @@
                 <TitleText>Video display title</TitleText>
                 <TitleText TitleType="SubTitle">Video subtitle</TitleText>
             </DisplayTitle>
-            <DisplayArtistName>John Doe</DisplayArtistName>
+            <DisplayArtistName ApplicableTerritoryCode="Worldwide">John Doe</DisplayArtistName>
             <DisplayArtist SequenceNumber="1">
                 <ArtistPartyReference>PJohnDoe</ArtistPartyReference>
                 <DisplayArtistRole>MainArtist</DisplayArtistRole>
@@ -110,7 +110,7 @@
                 <TitleText>Video display title</TitleText>
                 <TitleText TitleType="SubTitle">Video</TitleText>
             </DisplayTitle>
-            <DisplayArtistName>John Doe</DisplayArtistName>
+            <DisplayArtistName ApplicableTerritoryCode="Worldwide">John Doe</DisplayArtistName>
             <DisplayArtist SequenceNumber="1">
                 <ArtistPartyReference>PJohnDoe</ArtistPartyReference>
                 <DisplayArtistRole>MainArtist</DisplayArtistRole>

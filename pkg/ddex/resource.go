@@ -13,20 +13,20 @@ type ResourceList struct {
 
 // Video represents a video resource
 type Video struct {
-	XMLName                  xml.Name                   `xml:"Video"`
-	ResourceReference        string                     `xml:"ResourceReference"`
-	Type                     string                     `xml:"Type,omitempty"`
-	VideoEdition             []VideoEdition             `xml:"VideoEdition,omitempty"`
-	DisplayTitleText         *DisplayTitleText          `xml:"DisplayTitleText,omitempty"`
-	DisplayTitle             *DisplayTitle              `xml:"DisplayTitle,omitempty"`
-	DisplayArtistName        []string                   `xml:"DisplayArtistName,omitempty"`
-	DisplayArtist            []DisplayArtist            `xml:"DisplayArtist,omitempty"`
-	Contributor              []Contributor              `xml:"Contributor,omitempty"`
-	ResourceRightsController []ResourceRightsController `xml:"ResourceRightsController,omitempty"`
-	Duration                 string                     `xml:"Duration,omitempty"`
-	CreationDate             *CreationDate              `xml:"CreationDate,omitempty"`
-	ParentalWarningType      string                     `xml:"ParentalWarningType,omitempty"`
-	Keywords                 []Keywords                 `xml:"Keywords,omitempty"`
+	XMLName                  xml.Name                                `xml:"Video"`
+	ResourceReference        string                                  `xml:"ResourceReference"`
+	Type                     string                                  `xml:"Type,omitempty"`
+	VideoEdition             []VideoEdition                          `xml:"VideoEdition,omitempty"`
+	DisplayTitleText         *DisplayTitleText                       `xml:"DisplayTitleText,omitempty"`
+	DisplayTitle             *DisplayTitle                           `xml:"DisplayTitle,omitempty"`
+	DisplayArtistName        []DisplayArtistNameWithOriginalLanguage `xml:"DisplayArtistName,omitempty"`
+	DisplayArtist            []DisplayArtist                         `xml:"DisplayArtist,omitempty"`
+	Contributor              []Contributor                           `xml:"Contributor,omitempty"`
+	ResourceRightsController []ResourceRightsController              `xml:"ResourceRightsController,omitempty"`
+	Duration                 string                                  `xml:"Duration,omitempty"`
+	CreationDate             *CreationDate                           `xml:"CreationDate,omitempty"`
+	ParentalWarningType      string                                  `xml:"ParentalWarningType,omitempty"`
+	Keywords                 []Keywords                              `xml:"Keywords,omitempty"`
 }
 
 // VideoEdition represents different editions of a video

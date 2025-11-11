@@ -10,28 +10,28 @@ type ReleaseList struct {
 
 // Release represents a single release
 type Release struct {
-	XMLName               xml.Name                `xml:"Release"`
-	ReleaseReference      string                  `xml:"ReleaseReference"`
-	ReleaseType           string                  `xml:"ReleaseType,omitempty"`
-	ReleaseId             []ReleaseId             `xml:"ReleaseId,omitempty"`
-	DisplayTitleText      []DisplayTitleText      `xml:"DisplayTitleText"`
-	DisplayTitle          []DisplayTitle          `xml:"DisplayTitle,omitempty"`
-	DisplayArtistName     []string                `xml:"DisplayArtistName,omitempty"`
-	DisplayArtist         []DisplayArtist         `xml:"DisplayArtist,omitempty"`
-	ReleaseLabelReference []ReleaseLabelReference `xml:"ReleaseLabelReference,omitempty"`
-	PLine                 []PLine                 `xml:"PLine,omitempty"`
-	CLine                 []CLine                 `xml:"CLine,omitempty"`
-	Duration              string                  `xml:"Duration,omitempty"`
-	ReleaseDate           []EventDateWithDefault  `xml:"ReleaseDate,omitempty"`
-	OriginalReleaseDate   []EventDateWithDefault  `xml:"OriginalReleaseDate,omitempty"`
-	DisplayGenre          []DisplayGenre          `xml:"DisplayGenre,omitempty"`
-	ParentalWarningType   string                  `xml:"ParentalWarningType,omitempty"`
-	AvRating              []AvRating              `xml:"AvRating,omitempty"`
-	RelatedResource       []RelatedResource       `xml:"RelatedResource,omitempty"`
-	ResourceGroup         []ResourceGroup         `xml:"ResourceGroup,omitempty"`
-	Keywords              []Keywords              `xml:"Keywords,omitempty"`
-	ContainsAI            string                  `xml:"ContainsAI,omitempty"`
-	MarketingComment      []MarketingComment      `xml:"MarketingComment,omitempty"`
+	XMLName               xml.Name                                `xml:"Release"`
+	ReleaseReference      string                                  `xml:"ReleaseReference"`
+	ReleaseType           string                                  `xml:"ReleaseType,omitempty"`
+	ReleaseId             []ReleaseId                             `xml:"ReleaseId,omitempty"`
+	DisplayTitleText      []DisplayTitleText                      `xml:"DisplayTitleText"`
+	DisplayTitle          []DisplayTitle                          `xml:"DisplayTitle,omitempty"`
+	DisplayArtistName     []DisplayArtistNameWithOriginalLanguage `xml:"DisplayArtistName,omitempty"`
+	DisplayArtist         []DisplayArtist                         `xml:"DisplayArtist,omitempty"`
+	ReleaseLabelReference []ReleaseLabelReference                 `xml:"ReleaseLabelReference,omitempty"`
+	PLine                 []PLine                                 `xml:"PLine,omitempty"`
+	CLine                 []CLine                                 `xml:"CLine,omitempty"`
+	Duration              string                                  `xml:"Duration,omitempty"`
+	ReleaseDate           []EventDateWithDefault                  `xml:"ReleaseDate,omitempty"`
+	OriginalReleaseDate   []EventDateWithDefault                  `xml:"OriginalReleaseDate,omitempty"`
+	DisplayGenre          []DisplayGenre                          `xml:"DisplayGenre,omitempty"`
+	ParentalWarningType   string                                  `xml:"ParentalWarningType,omitempty"`
+	AvRating              []AvRating                              `xml:"AvRating,omitempty"`
+	RelatedResource       []RelatedResource                       `xml:"RelatedResource,omitempty"`
+	ResourceGroup         []ResourceGroup                         `xml:"ResourceGroup,omitempty"`
+	Keywords              []Keywords                              `xml:"Keywords,omitempty"`
+	ContainsAI            string                                  `xml:"ContainsAI,omitempty"`
+	MarketingComment      []MarketingComment                      `xml:"MarketingComment,omitempty"`
 }
 
 // RelatedResource represents a resource that is related to the release

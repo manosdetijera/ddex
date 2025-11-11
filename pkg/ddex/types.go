@@ -145,3 +145,14 @@ type RatingAgency struct {
 	Value     string   `xml:",chardata"`
 	Namespace string   `xml:"Namespace,attr,omitempty"`
 }
+
+// DisplayArtistNameWithOriginalLanguage represents a display artist name with territory and language attributes
+// Following ERN 4.3 standard specification (ddexC:DisplayArtistNameWithOriginalLanguage)
+type DisplayArtistNameWithOriginalLanguage struct {
+	XMLName                 xml.Name `xml:"DisplayArtistName"`
+	Value                   string   `xml:",chardata"`
+	LanguageAndScriptCode   string   `xml:"LanguageAndScriptCode,attr,omitempty"`
+	ApplicableTerritoryCode string   `xml:"ApplicableTerritoryCode,attr,omitempty"`
+	IsDefault               bool     `xml:"IsDefault,attr,omitempty"`
+	IsInOriginalLanguage    bool     `xml:"IsInOriginalLanguage,attr,omitempty"`
+}
