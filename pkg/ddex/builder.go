@@ -824,10 +824,16 @@ type ResourceGroupBuilder struct {
 }
 
 // AddContentItem adds a content item to the resource group
-func (rgb *ResourceGroupBuilder) AddContentItem(sequenceNumber int, resourceRef string) *ResourceGroupBuilder {
+// resourceType can be "Video", "Image", "SoundRecording", etc.
+// releaseResourceType can be "PrimaryResource", "SecondaryResource", etc.
+func (rgb *ResourceGroupBuilder) AddContentItem(sequenceNumber int, resourceType, resourceRef, releaseResourceType string) *ResourceGroupBuilder {
 	item := ResourceGroupContentItem{
-		SequenceNumber:           sequenceNumber,
-		ReleaseResourceReference: resourceRef,
+		SequenceNumber: sequenceNumber,
+		ResourceType:   resourceType,
+		ReleaseResourceReference: ReleaseResourceReference{
+			ReleaseResourceType: releaseResourceType,
+			Value:               resourceRef,
+		},
 	}
 
 	rgb.group.ResourceGroupContentItem = append(rgb.group.ResourceGroupContentItem, item)
@@ -885,25 +891,45 @@ type DealBuilder struct {
 	deal               *Deal
 }
 
-// WithTerritories sets the deal territories for ERN 3.8 (can be called multiple times)
-func (db *DealBuilder) WithTerritory(territoryCode string) *DealBuilder {
+// WithTerritories sets the deal territories for ERN 3.8
+func (db *DealBuilder) WithTerritories(territoryCodes []string) *DealBuilder {
 	if db.deal.DealTerms == nil {
 		db.deal.DealTerms = &DealTerms{}
 	}
-	db.deal.DealTerms.TerritoryCode = append(db.deal.DealTerms.TerritoryCode, territoryCode)
+	db.deal.DealTerms.TerritoryCode = append(db.deal.DealTerms.TerritoryCode, territoryCodes...)
 	return db
 }
 
-// WithValidityPeriod sets the deal validity period with a start date (YYYY-MM-DD)
-func (db *DealBuilder) WithValidityPeriod(startDate string, endDate string) *DealBuilder {
+// WithValidityPeriodStartDate sets the deal validity period start date (YYYY-MM-DD)
+func (db *DealBuilder) WithValidityPeriodStartDate(startDate string) *DealBuilder {
 	if db.deal.DealTerms == nil {
 		db.deal.DealTerms = &DealTerms{}
 	}
 
-	db.deal.DealTerms.ValidityPeriod = append(db.deal.DealTerms.ValidityPeriod, ValidityPeriod{
-		StartDate: startDate,
-		EndDate:   endDate,
-	})
+	// Ensure at least one ValidityPeriod exists
+	if len(db.deal.DealTerms.ValidityPeriod) == 0 {
+		db.deal.DealTerms.ValidityPeriod = append(db.deal.DealTerms.ValidityPeriod, ValidityPeriod{})
+	}
+
+	// Set the start date on the first ValidityPeriod
+	db.deal.DealTerms.ValidityPeriod[0].StartDate = startDate
+
+	return db
+}
+
+// WithValidityPeriodEndDate sets the deal validity period end date (YYYY-MM-DD)
+func (db *DealBuilder) WithValidityPeriodEndDate(endDate string) *DealBuilder {
+	if db.deal.DealTerms == nil {
+		db.deal.DealTerms = &DealTerms{}
+	}
+
+	// Ensure at least one ValidityPeriod exists
+	if len(db.deal.DealTerms.ValidityPeriod) == 0 {
+		db.deal.DealTerms.ValidityPeriod = append(db.deal.DealTerms.ValidityPeriod, ValidityPeriod{})
+	}
+
+	// Set the end date on the first ValidityPeriod
+	db.deal.DealTerms.ValidityPeriod[0].EndDate = endDate
 
 	return db
 }

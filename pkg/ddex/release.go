@@ -182,7 +182,8 @@ type AdditionalTitle struct {
 type ResourceGroupContentItem struct {
 	XMLName                        xml.Name                         `xml:"ResourceGroupContentItem"`
 	SequenceNumber                 int                              `xml:"SequenceNumber,omitempty"`
-	ReleaseResourceReference       string                           `xml:"ReleaseResourceReference"`
+	ResourceType                   string                           `xml:"ResourceType,omitempty"`
+	ReleaseResourceReference       ReleaseResourceReference         `xml:"ReleaseResourceReference"`
 	LinkedReleaseResourceReference []LinkedReleaseResourceReference `xml:"LinkedReleaseResourceReference,omitempty"`
 }
 
