@@ -8,19 +8,18 @@ import (
 // NewReleaseMessage represents the complete DDEX ERN 3.8 NewReleaseMessage structure
 // specifically configured for YouTube delivery
 type NewReleaseMessage struct {
-	XMLName                 xml.Name        `xml:"ern:NewReleaseMessage"`
-	XmlnsErn                string          `xml:"xmlns:ern,attr"`
-	XmlnsXsi                string          `xml:"xmlns:xsi,attr,omitempty"`
-	XsiSchemaLocation       string          `xml:"xsi:schemaLocation,attr,omitempty"`
-	MessageSchemaVersionId  string          `xml:"MessageSchemaVersionId,attr"`
-	ReleaseProfileVersionId string          `xml:"ReleaseProfileVersionId,attr,omitempty"`
-	LanguageAndScriptCode   string          `xml:"LanguageAndScriptCode,attr,omitempty"`
-	MessageHeader           *MessageHeader  `xml:"MessageHeader"`
-	UpdateIndicator         string          `xml:"UpdateIndicator,omitempty"` // Deprecated: OriginalMessage or UpdateMessage
-	ResourceList            *ResourceList   `xml:"ResourceList,omitempty"`
-	CollectionList          *CollectionList `xml:"CollectionList,omitempty"`
-	ReleaseList             *ReleaseList    `xml:"ReleaseList"`
-	DealList                *DealList       `xml:"DealList"`
+	XMLName                xml.Name        `xml:"ern:NewReleaseMessage"`
+	XmlnsErn               string          `xml:"xmlns:ern,attr"`
+	XmlnsXsi               string          `xml:"xmlns:xsi,attr,omitempty"`
+	XsiSchemaLocation      string          `xml:"xsi:schemaLocation,attr,omitempty"`
+	MessageSchemaVersionId string          `xml:"MessageSchemaVersionId,attr"`
+	LanguageAndScriptCode  string          `xml:"LanguageAndScriptCode,attr,omitempty"`
+	MessageHeader          *MessageHeader  `xml:"MessageHeader"`
+	UpdateIndicator        string          `xml:"UpdateIndicator,omitempty"` // Deprecated: OriginalMessage or UpdateMessage
+	ResourceList           *ResourceList   `xml:"ResourceList,omitempty"`
+	CollectionList         *CollectionList `xml:"CollectionList,omitempty"`
+	ReleaseList            *ReleaseList    `xml:"ReleaseList"`
+	DealList               *DealList       `xml:"DealList"`
 }
 
 // CollectionList represents collections (playlists, compilations)
@@ -64,41 +63,34 @@ type NewReleaseMessageBuilder struct {
 }
 
 // NewNewReleaseMessage creates a new ERN 3.8 NewReleaseMessage for YouTube
-func NewNewReleaseMessage(messageId, threadId, senderDPID, senderName, releaseProfileVersionId string) *NewReleaseMessage {
+func NewNewReleaseMessage(messageId, threadId, senderDPID, senderName string) *NewReleaseMessage {
 	// Create message header
 	sender := NewMessageSender(senderDPID, senderName)
 	header := NewMessageHeader(threadId, messageId, sender)
 
 	return &NewReleaseMessage{
-		MessageSchemaVersionId:  MessageSchemaVersionId,
-		XmlnsErn:                XmlnsErn,
-		XmlnsXsi:                XmlnsXsi,
-		XsiSchemaLocation:       XsiSchemaLocation,
-		ReleaseProfileVersionId: releaseProfileVersionId,
-		LanguageAndScriptCode:   "en",
-		MessageHeader:           header,
-		ResourceList:            &ResourceList{},
-		ReleaseList:             &ReleaseList{},
-		DealList:                &DealList{},
+		MessageSchemaVersionId: MessageSchemaVersionId,
+		XmlnsErn:               XmlnsErn,
+		XmlnsXsi:               XmlnsXsi,
+		XsiSchemaLocation:      XsiSchemaLocation,
+		LanguageAndScriptCode:  "en",
+		MessageHeader:          header,
+		ResourceList:           &ResourceList{},
+		ReleaseList:            &ReleaseList{},
+		DealList:               &DealList{},
 	}
 }
 
 // NewBuilder creates a new builder for constructing NewReleaseMessage
-func NewBuilder(messageId, threadId, senderDPID, senderName, releaseProfileVersionId string) *NewReleaseMessageBuilder {
+func NewBuilder(messageId, threadId, senderDPID, senderName string) *NewReleaseMessageBuilder {
 	return &NewReleaseMessageBuilder{
-		message: NewNewReleaseMessage(messageId, threadId, senderDPID, senderName, releaseProfileVersionId),
+		message: NewNewReleaseMessage(messageId, threadId, senderDPID, senderName),
 	}
 }
 
 // SetLanguage sets the language and script code for the message
 func (b *NewReleaseMessage) SetLanguage(languageCode string) *NewReleaseMessage {
 	b.LanguageAndScriptCode = languageCode
-	return b
-}
-
-// SetReleaseProfile sets the release profile version
-func (b *NewReleaseMessage) SetReleaseProfile(profileVersion string) *NewReleaseMessage {
-	b.ReleaseProfileVersionId = profileVersion
 	return b
 }
 

@@ -16,15 +16,14 @@ type Builder struct {
 func NewDDEXBuilder() *Builder {
 	return &Builder{
 		Message: &NewReleaseMessage{
-			XmlnsErn:                XmlnsErn,
-			XmlnsXsi:                XmlnsXsi,
-			XsiSchemaLocation:       XsiSchemaLocation,
-			MessageSchemaVersionId:  MessageSchemaVersionId,
-			ReleaseProfileVersionId: "Video",
-			LanguageAndScriptCode:   "en",
-			ResourceList:            &ResourceList{},
-			ReleaseList:             &ReleaseList{},
-			DealList:                &DealList{},
+			XmlnsErn:               XmlnsErn,
+			XmlnsXsi:               XmlnsXsi,
+			XsiSchemaLocation:      XsiSchemaLocation,
+			MessageSchemaVersionId: MessageSchemaVersionId,
+			LanguageAndScriptCode:  "en",
+			ResourceList:           &ResourceList{},
+			ReleaseList:            &ReleaseList{},
+			DealList:               &DealList{},
 		},
 	}
 }
