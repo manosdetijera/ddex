@@ -119,14 +119,15 @@ type RelatedRelease struct {
 	ReleaseId               ReleaseId `xml:"ReleaseId"`
 }
 
-// ReleaseId represents release identification (ICPN, GRid, ISAN, etc.) for ERN 3.8
+// ReleaseId represents release identification (ICPN, GRid, ISRC, etc.) for ERN 3.8
 type ReleaseId struct {
 	XMLName       xml.Name        `xml:"ReleaseId"`
-	ICPN          string          `xml:"ICPN,omitempty"`
-	GRid          string          `xml:"GRid,omitempty"`
-	ISAN          string          `xml:"ISAN,omitempty"`
-	CatalogNumber *CatalogNumber  `xml:"CatalogNumber,omitempty"`
-	ProprietaryId []ProprietaryId `xml:"ProprietaryId,omitempty"`
+	GRid          string          `xml:"GRid,omitempty"`          // 0-1
+	ISRC          string          `xml:"ISRC,omitempty"`          // 0-1
+	ICPN          string          `xml:"ICPN,omitempty"`          // 0-1
+	ISAN          string          `xml:"ISAN,omitempty"`          // 0-1
+	CatalogNumber *CatalogNumber  `xml:"CatalogNumber,omitempty"` // 0-1
+	ProprietaryId []ProprietaryId `xml:"ProprietaryId,omitempty"` // 0-n
 }
 
 // CatalogNumber represents a catalog number

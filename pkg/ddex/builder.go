@@ -196,16 +196,16 @@ type VideoBuilder struct {
 // ensureTerritory ensures there's a territory to work with (defaults to Worldwide)
 func (vb *VideoBuilder) ensureTerritory() {
 	if vb.currentTerritoryDetails == nil {
-		vb.WithTerritory("Worldwide")
+		vb.WithTerritory([]string{"Worldwide"})
 	}
 }
 
 // WithTerritory creates or switches to a territory section
-func (vb *VideoBuilder) WithTerritory(territoryCode string) *VideoBuilder {
-	// Check if territory already exists
-	for i, details := range vb.video.VideoDetailsByTerritory {
-		for _, code := range details.TerritoryCode {
-			if code == territoryCode {
+func (vb *VideoBuilder) WithTerritory(territoryCodes []string) *VideoBuilder {
+	// Check if territory already exists (compare first code for simplicity)
+	if len(territoryCodes) > 0 {
+		for i, details := range vb.video.VideoDetailsByTerritory {
+			if len(details.TerritoryCode) > 0 && details.TerritoryCode[0] == territoryCodes[0] {
 				vb.currentTerritoryDetails = &vb.video.VideoDetailsByTerritory[i]
 				vb.currentTerritoryIndex = i
 				return vb
@@ -215,7 +215,7 @@ func (vb *VideoBuilder) WithTerritory(territoryCode string) *VideoBuilder {
 
 	// Create new territory details
 	newDetails := VideoDetailsByTerritory{
-		TerritoryCode: []string{territoryCode},
+		TerritoryCode: territoryCodes,
 	}
 	vb.video.VideoDetailsByTerritory = append(vb.video.VideoDetailsByTerritory, newDetails)
 	vb.currentTerritoryIndex = len(vb.video.VideoDetailsByTerritory) - 1
@@ -439,16 +439,16 @@ type ImageBuilder struct {
 // ensureTerritory ensures there's a territory to work with (defaults to Worldwide)
 func (ib *ImageBuilder) ensureTerritory() {
 	if ib.currentTerritoryDetails == nil {
-		ib.WithTerritory("Worldwide")
+		ib.WithTerritory([]string{"Worldwide"})
 	}
 }
 
 // WithTerritory creates or switches to a territory section
-func (ib *ImageBuilder) WithTerritory(territoryCode string) *ImageBuilder {
-	// Check if territory already exists
-	for i, details := range ib.image.ImageDetailsByTerritory {
-		for _, code := range details.TerritoryCode {
-			if code == territoryCode {
+func (ib *ImageBuilder) WithTerritory(territoryCodes []string) *ImageBuilder {
+	// Check if territory already exists (compare first code for simplicity)
+	if len(territoryCodes) > 0 {
+		for i, details := range ib.image.ImageDetailsByTerritory {
+			if len(details.TerritoryCode) > 0 && details.TerritoryCode[0] == territoryCodes[0] {
 				ib.currentTerritoryDetails = &ib.image.ImageDetailsByTerritory[i]
 				ib.currentTerritoryIndex = i
 				return ib
@@ -458,7 +458,7 @@ func (ib *ImageBuilder) WithTerritory(territoryCode string) *ImageBuilder {
 
 	// Create new territory details
 	newDetails := ImageDetailsByTerritory{
-		TerritoryCode: []string{territoryCode},
+		TerritoryCode: territoryCodes,
 	}
 	ib.image.ImageDetailsByTerritory = append(ib.image.ImageDetailsByTerritory, newDetails)
 	ib.currentTerritoryIndex = len(ib.image.ImageDetailsByTerritory) - 1
@@ -547,10 +547,12 @@ func (rb *ReleaseBuilder) WithTitle(title, subtitle string) *ReleaseBuilder {
 
 // WithTerritory creates or switches to a territory-specific details section
 // This is mandatory in ERN 3.8 - at least one territory must be specified
-func (rb *ReleaseBuilder) WithTerritory(territoryCode string) *ReleaseBuilder {
+// WithTerritory creates or switches to a territory-specific details section
+// This is mandatory in ERN 3.8 - at least one territory must be specified
+func (rb *ReleaseBuilder) WithTerritory(territoryCodes []string) *ReleaseBuilder {
 	// Create new territory details
 	territoryDetails := ReleaseDetailsByTerritory{
-		TerritoryCode: []string{territoryCode},
+		TerritoryCode: territoryCodes,
 	}
 	rb.release.ReleaseDetailsByTerritory = append(rb.release.ReleaseDetailsByTerritory, territoryDetails)
 	rb.currentTerritoryIndex = len(rb.release.ReleaseDetailsByTerritory) - 1
@@ -561,7 +563,7 @@ func (rb *ReleaseBuilder) WithTerritory(territoryCode string) *ReleaseBuilder {
 // ensureTerritory creates a default Worldwide territory if none exists
 func (rb *ReleaseBuilder) ensureTerritory() {
 	if rb.currentTerritoryDetails == nil {
-		rb.WithTerritory("Worldwide")
+		rb.WithTerritory([]string{"Worldwide"})
 	}
 }
 
@@ -747,6 +749,15 @@ func (rb *ReleaseBuilder) WithKeywords(keywords, languageCode string) *ReleaseBu
 func (rb *ReleaseBuilder) WithICPN(icpn string) *ReleaseBuilder {
 	rb.release.ReleaseId = append(rb.release.ReleaseId, ReleaseId{
 		ICPN: icpn,
+	})
+	return rb
+}
+
+// WithISRC sets the ISRC identifier for the release
+// Only applicable when the Release contains only one SoundRecording or one MusicalWorkVideo
+func (rb *ReleaseBuilder) WithISRC(isrc string) *ReleaseBuilder {
+	rb.release.ReleaseId = append(rb.release.ReleaseId, ReleaseId{
+		ISRC: isrc,
 	})
 	return rb
 }
