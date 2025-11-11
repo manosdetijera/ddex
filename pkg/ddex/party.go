@@ -2,19 +2,18 @@ package ddex
 
 import "encoding/xml"
 
-// PartyList is a new composite in ERN 4 containing Party composites, consolidating data
-// for all parties in the message—such as artists, writers, and labels.
+// PartyList contains all Party composites - used in ERN 3.8 and ERN 4.x
 type PartyList struct {
 	XMLName xml.Name `xml:"PartyList"`
 	Party   []Party  `xml:"Party"`
 }
 
-// Party represents a party (artist, writer, label, etc.) in the DDEX message
+// Party represents a party (artist, writer, label, etc.) in the DDEX message for ERN 3.8
 type Party struct {
-	XMLName        xml.Name  `xml:"Party"`
-	PartyReference string    `xml:"PartyReference"`
-	PartyName      PartyName `xml:"PartyName"`
-	PartyId        []PartyId `xml:"PartyId,omitempty"`
+	XMLName        xml.Name   `xml:"Party"`
+	PartyReference string     `xml:"PartyReference"`
+	PartyName      *PartyName `xml:"PartyName,omitempty"`
+	PartyId        []PartyId  `xml:"PartyId,omitempty"`
 }
 
 type PartyId struct {
@@ -78,7 +77,7 @@ type ContactInformation struct {
 func NewParty(reference, name string) *Party {
 	return &Party{
 		PartyReference: reference,
-		PartyName: PartyName{
+		PartyName: &PartyName{
 			FullName: name,
 		},
 	}
@@ -88,7 +87,7 @@ func NewParty(reference, name string) *Party {
 func NewPartyWithIndexedName(reference, name, indexedName string) *Party {
 	return &Party{
 		PartyReference: reference,
-		PartyName: PartyName{
+		PartyName: &PartyName{
 			FullName:        name,
 			FullNameIndexed: indexedName,
 		},

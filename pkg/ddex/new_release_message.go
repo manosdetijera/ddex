@@ -5,19 +5,18 @@ import (
 	"fmt"
 )
 
-// NewReleaseMessage represents the complete DDEX ERN 4.3 NewReleaseMessage structure
+// NewReleaseMessage represents the complete DDEX ERN 3.8 NewReleaseMessage structure
 // specifically configured for YouTube delivery
 type NewReleaseMessage struct {
 	XMLName                 xml.Name        `xml:"ern:NewReleaseMessage"`
-	XmlnsErn                string          `xml:"xmlns:ern,attr,omitempty"`
+	XmlnsErn                string          `xml:"xmlns:ern,attr"`
 	XmlnsXsi                string          `xml:"xmlns:xsi,attr,omitempty"`
 	XsiSchemaLocation       string          `xml:"xsi:schemaLocation,attr,omitempty"`
-	MessageSchemaVersionId  string          `xml:"MessageSchemaVersionId,attr,omitempty"`
+	MessageSchemaVersionId  string          `xml:"MessageSchemaVersionId,attr"`
 	ReleaseProfileVersionId string          `xml:"ReleaseProfileVersionId,attr,omitempty"`
 	LanguageAndScriptCode   string          `xml:"LanguageAndScriptCode,attr,omitempty"`
-	AvsVersionId            string          `xml:"AvsVersionId,attr,omitempty"`
 	MessageHeader           *MessageHeader  `xml:"MessageHeader"`
-	PartyList               *PartyList      `xml:"PartyList,omitempty"`
+	UpdateIndicator         string          `xml:"UpdateIndicator,omitempty"` // Deprecated: OriginalMessage or UpdateMessage
 	ResourceList            *ResourceList   `xml:"ResourceList,omitempty"`
 	CollectionList          *CollectionList `xml:"CollectionList,omitempty"`
 	ReleaseList             *ReleaseList    `xml:"ReleaseList"`
@@ -51,12 +50,12 @@ type CollectionDetailsByTerritory struct {
 	Genre             []Genre     `xml:"Genre,omitempty"`
 }
 
-// YouTube-specific constants for ERN 4.3
+// YouTube-specific constants for ERN 3.8
 const (
-	MessageSchemaVersionId = "ern/43"
-	XmlnsErn               = "http://ddex.net/xml/ern/43"
+	MessageSchemaVersionId = "ern/382"
+	XmlnsErn               = "http://ddex.net/xml/ern/382"
 	XmlnsXsi               = "http://www.w3.org/2001/XMLSchema-instance"
-	XsiSchemaLocation      = "http://ddex.net/xml/ern/43 http://ddex.net/xml/ern/43/release-notification.xsd"
+	XsiSchemaLocation      = "http://ddex.net/xml/ern/382 http://ddex.net/xml/ern/382/release-notification.xsd"
 )
 
 // NewReleaseMessageBuilder provides a fluent interface for building DDEX messages
@@ -64,7 +63,7 @@ type NewReleaseMessageBuilder struct {
 	message *NewReleaseMessage
 }
 
-// NewNewReleaseMessage creates a new ERN 4.3 NewReleaseMessage for YouTube
+// NewNewReleaseMessage creates a new ERN 3.8 NewReleaseMessage for YouTube
 func NewNewReleaseMessage(messageId, threadId, senderDPID, senderName, releaseProfileVersionId string) *NewReleaseMessage {
 	// Create message header
 	sender := NewMessageSender(senderDPID, senderName)
@@ -77,9 +76,7 @@ func NewNewReleaseMessage(messageId, threadId, senderDPID, senderName, releasePr
 		XsiSchemaLocation:       XsiSchemaLocation,
 		ReleaseProfileVersionId: releaseProfileVersionId,
 		LanguageAndScriptCode:   "en",
-		AvsVersionId:            "9",
 		MessageHeader:           header,
-		PartyList:               &PartyList{},
 		ResourceList:            &ResourceList{},
 		ReleaseList:             &ReleaseList{},
 		DealList:                &DealList{},
@@ -105,12 +102,11 @@ func (b *NewReleaseMessage) SetReleaseProfile(profileVersion string) *NewRelease
 	return b
 }
 
-// AddParty adds a party to the party list
-func (b *NewReleaseMessage) AddParty(party *Party) *NewReleaseMessage {
-	if b.PartyList == nil {
-		b.PartyList = &PartyList{}
-	}
-	b.PartyList.Party = append(b.PartyList.Party, *party)
+// SetUpdateIndicator sets the update indicator
+// Valid values: "OriginalMessage" or "UpdateMessage"
+// Note: This element is deprecated in ERN 3.8
+func (b *NewReleaseMessage) SetUpdateIndicator(indicator string) *NewReleaseMessage {
+	b.UpdateIndicator = indicator
 	return b
 }
 
@@ -235,17 +231,20 @@ func (nrm *NewReleaseMessage) Validate() error {
 	return nil
 }
 
-// GetReleaseIDs returns all release IDs from the message
+// GetReleaseIDs returns all release IDs from the message (ERN 3.8)
 func (nrm *NewReleaseMessage) GetReleaseIDs() []string {
 	var ids []string
 	if nrm.ReleaseList != nil {
 		for _, release := range nrm.ReleaseList.Release {
 			for _, releaseID := range release.ReleaseId {
-				if releaseID.ICPN != nil && releaseID.ICPN.Value != "" {
-					ids = append(ids, releaseID.ICPN.Value)
+				if releaseID.ICPN != "" {
+					ids = append(ids, releaseID.ICPN)
 				}
 				if releaseID.GRid != "" {
 					ids = append(ids, releaseID.GRid)
+				}
+				if releaseID.ISAN != "" {
+					ids = append(ids, releaseID.ISAN)
 				}
 			}
 		}

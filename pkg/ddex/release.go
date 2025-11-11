@@ -8,66 +8,135 @@ type ReleaseList struct {
 	Release []Release `xml:"Release"`
 }
 
-// Release represents a single release
+// Release represents a single release for ERN 3.8
+// Following ERN 3.8 specification with mandatory ReferenceTitle and ReleaseDetailsByTerritory
 type Release struct {
-	XMLName               xml.Name                                `xml:"Release"`
-	ReleaseReference      string                                  `xml:"ReleaseReference"`
-	ReleaseType           string                                  `xml:"ReleaseType,omitempty"`
-	ReleaseId             []ReleaseId                             `xml:"ReleaseId,omitempty"`
-	DisplayTitleText      []DisplayTitleText                      `xml:"DisplayTitleText"`
-	DisplayTitle          []DisplayTitle                          `xml:"DisplayTitle,omitempty"`
-	DisplayArtistName     []DisplayArtistNameWithOriginalLanguage `xml:"DisplayArtistName,omitempty"`
-	DisplayArtist         []DisplayArtist                         `xml:"DisplayArtist,omitempty"`
-	ReleaseLabelReference []ReleaseLabelReference                 `xml:"ReleaseLabelReference,omitempty"`
-	PLine                 []PLine                                 `xml:"PLine,omitempty"`
-	CLine                 []CLine                                 `xml:"CLine,omitempty"`
-	Duration              string                                  `xml:"Duration,omitempty"`
-	ReleaseDate           []EventDateWithDefault                  `xml:"ReleaseDate,omitempty"`
-	OriginalReleaseDate   []EventDateWithDefault                  `xml:"OriginalReleaseDate,omitempty"`
-	DisplayGenre          []DisplayGenre                          `xml:"DisplayGenre,omitempty"`
-	ParentalWarningType   string                                  `xml:"ParentalWarningType,omitempty"`
-	AvRating              []AvRating                              `xml:"AvRating,omitempty"`
-	RelatedResource       []RelatedResource                       `xml:"RelatedResource,omitempty"`
-	ResourceGroup         []ResourceGroup                         `xml:"ResourceGroup,omitempty"`
-	Keywords              []Keywords                              `xml:"Keywords,omitempty"`
-	ContainsAI            string                                  `xml:"ContainsAI,omitempty"`
-	MarketingComment      []MarketingComment                      `xml:"MarketingComment,omitempty"`
+	XMLName                   xml.Name                    `xml:"Release"`
+	LanguageAndScriptCode     string                      `xml:"LanguageAndScriptCode,attr,omitempty"`
+	IsMainRelease             bool                        `xml:"IsMainRelease,attr,omitempty"`
+	ReleaseReference          string                      `xml:"ReleaseReference,omitempty"`
+	ReleaseId                 []ReleaseId                 `xml:"ReleaseId"`
+	ExternalResourceLink      []ExternalResourceLink      `xml:"ExternalResourceLink,omitempty"`
+	ReferenceTitle            *ReferenceTitle             `xml:"ReferenceTitle"`
+	ReleaseResourceReference  []string                    `xml:"ReleaseResourceReference,omitempty"`
+	ReleaseType               []ReleaseType               `xml:"ReleaseType,omitempty"`
+	ReleaseDetailsByTerritory []ReleaseDetailsByTerritory `xml:"ReleaseDetailsByTerritory"`
+	LanguageOfPerformance     []string                    `xml:"LanguageOfPerformance,omitempty"`
+	LanguageOfDubbing         []string                    `xml:"LanguageOfDubbing,omitempty"`
+	SubTitleLanguage          []string                    `xml:"SubTitleLanguage,omitempty"`
+	Duration                  string                      `xml:"Duration,omitempty"`
+	PLine                     []PLine                     `xml:"PLine,omitempty"`
+	CLine                     []CLine                     `xml:"CLine,omitempty"`
+	GlobalReleaseDate         *EventDate                  `xml:"GlobalReleaseDate,omitempty"`
+	GlobalOriginalReleaseDate *EventDate                  `xml:"GlobalOriginalReleaseDate,omitempty"`
 }
 
-// RelatedResource represents a resource that is related to the release
-type RelatedResource struct {
-	XMLName                  xml.Name          `xml:"RelatedResource"`
-	ResourceRelationshipType string            `xml:"ResourceRelationshipType"`
-	ResourceId               RelatedResourceId `xml:"ResourceId"`
+// ReferenceTitle represents the reference title of a release (mandatory in ERN 3.8)
+type ReferenceTitle struct {
+	XMLName   xml.Name `xml:"ReferenceTitle"`
+	TitleText string   `xml:"TitleText"`
+	SubTitle  string   `xml:"SubTitle,omitempty"`
 }
 
-// RelatedResourceId represents the identifier for a related resource
-type RelatedResourceId struct {
-	XMLName xml.Name `xml:"ResourceId"`
-	ISRC    string   `xml:"ISRC,omitempty"`
-	ISNI    string   `xml:"ISNI,omitempty"`
-}
-
-// ReleaseId represents release identification (ICPN, GRid, UPC, EAN, etc.)
-type ReleaseId struct {
-	XMLName       xml.Name        `xml:"ReleaseId"`
-	ICPN          *ICPN           `xml:"ICPN,omitempty"`
-	GRid          string          `xml:"GRid,omitempty"`
-	ProprietaryId []ProprietaryId `xml:"ProprietaryId,omitempty"`
-}
-
-// ICPN represents UPC/EAN identifiers
-type ICPN struct {
-	XMLName xml.Name `xml:"ICPN"`
+// ReleaseType represents the form in which a release is offered
+type ReleaseType struct {
+	XMLName xml.Name `xml:"ReleaseType"`
 	Value   string   `xml:",chardata"`
 }
 
-// ReleaseLabelReference represents a reference to a label party
-type ReleaseLabelReference struct {
-	XMLName                 xml.Name `xml:"ReleaseLabelReference"`
-	Value                   string   `xml:",chardata"`
-	ApplicableTerritoryCode string   `xml:"ApplicableTerritoryCode,attr,omitempty"`
+// ExternalResourceLink represents promotional or other material related to the release
+type ExternalResourceLink struct {
+	XMLName xml.Name `xml:"ExternalResourceLink"`
+	URL     string   `xml:"URL"`
 }
+
+// ReleaseDetailsByTerritory contains territory-specific release details (mandatory in ERN 3.8)
+type ReleaseDetailsByTerritory struct {
+	XMLName                     xml.Name                      `xml:"ReleaseDetailsByTerritory"`
+	LanguageAndScriptCode       string                        `xml:"LanguageAndScriptCode,attr,omitempty"`
+	TerritoryCode               []string                      `xml:"TerritoryCode,omitempty"`
+	ExcludedTerritoryCode       []string                      `xml:"ExcludedTerritoryCode,omitempty"`
+	DisplayArtistName           []Name                        `xml:"DisplayArtistName,omitempty"`
+	LabelName                   []LabelName                   `xml:"LabelName,omitempty"`
+	Title                       []Title                       `xml:"Title,omitempty"`
+	DisplayArtist               []DisplayArtist               `xml:"DisplayArtist,omitempty"`
+	IsMultiArtistCompilation    bool                          `xml:"IsMultiArtistCompilation,omitempty"`
+	AdministratingRecordCompany []AdministratingRecordCompany `xml:"AdministratingRecordCompany,omitempty"`
+	ReleaseType                 []ReleaseType                 `xml:"ReleaseType,omitempty"`
+	RelatedRelease              []RelatedRelease              `xml:"RelatedRelease,omitempty"`
+	ParentalWarningType         []ParentalWarningType         `xml:"ParentalWarningType,omitempty"`
+	AvRating                    []AvRating                    `xml:"AvRating,omitempty"`
+	MarketingComment            *Comment                      `xml:"MarketingComment,omitempty"`
+	ResourceGroup               []ResourceGroup               `xml:"ResourceGroup,omitempty"`
+	Genre                       []Genre                       `xml:"Genre,omitempty"`
+	PLine                       []PLine                       `xml:"PLine,omitempty"`
+	CLine                       []CLine                       `xml:"CLine,omitempty"`
+	ReleaseDate                 *EventDate                    `xml:"ReleaseDate,omitempty"`
+	OriginalReleaseDate         *EventDate                    `xml:"OriginalReleaseDate,omitempty"`
+	Keywords                    []Keywords                    `xml:"Keywords,omitempty"`
+	Synopsis                    *Synopsis                     `xml:"Synopsis,omitempty"`
+}
+
+// LabelName represents the label name
+type LabelName struct {
+	XMLName               xml.Name `xml:"LabelName"`
+	Value                 string   `xml:",chardata"`
+	LanguageAndScriptCode string   `xml:"LanguageAndScriptCode,attr,omitempty"`
+}
+
+// Title represents a title (different from DisplayTitle)
+type Title struct {
+	XMLName   xml.Name `xml:"Title"`
+	TitleText string   `xml:"TitleText"`
+	SubTitle  string   `xml:"SubTitle,omitempty"`
+}
+
+// AdministratingRecordCompany represents the administrating record company
+type AdministratingRecordCompany struct {
+	XMLName     xml.Name  `xml:"AdministratingRecordCompany"`
+	PartyId     []PartyId `xml:"PartyId,omitempty"`
+	PartyName   []Name    `xml:"PartyName,omitempty"`
+	TradingName string    `xml:"TradingName,omitempty"`
+}
+
+// ParentalWarningType represents parental warning classification
+type ParentalWarningType struct {
+	XMLName xml.Name `xml:"ParentalWarningType"`
+	Value   string   `xml:",chardata"`
+}
+
+// Comment represents a comment (used for MarketingComment, etc.)
+type Comment struct {
+	XMLName               xml.Name `xml:",omitempty"`
+	Value                 string   `xml:",chardata"`
+	LanguageAndScriptCode string   `xml:"LanguageAndScriptCode,attr,omitempty"`
+}
+
+// RelatedRelease represents a related release
+type RelatedRelease struct {
+	XMLName                 xml.Name  `xml:"RelatedRelease"`
+	ReleaseRelationshipType string    `xml:"ReleaseRelationshipType"`
+	ReleaseId               ReleaseId `xml:"ReleaseId"`
+}
+
+// ReleaseId represents release identification (ICPN, GRid, ISAN, etc.) for ERN 3.8
+type ReleaseId struct {
+	XMLName       xml.Name        `xml:"ReleaseId"`
+	ICPN          string          `xml:"ICPN,omitempty"`
+	GRid          string          `xml:"GRid,omitempty"`
+	ISAN          string          `xml:"ISAN,omitempty"`
+	CatalogNumber *CatalogNumber  `xml:"CatalogNumber,omitempty"`
+	ProprietaryId []ProprietaryId `xml:"ProprietaryId,omitempty"`
+}
+
+// CatalogNumber represents a catalog number
+type CatalogNumber struct {
+	XMLName   xml.Name `xml:"CatalogNumber"`
+	Value     string   `xml:",chardata"`
+	Namespace string   `xml:"Namespace,attr,omitempty"`
+}
+
+// ReleaseLabelReference has been simplified to just string in ERN 3.8
 
 // ResourceGroup represents a grouping of resources within a release
 type ResourceGroup struct {

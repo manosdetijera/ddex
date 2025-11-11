@@ -7,22 +7,21 @@ import (
 	"time"
 )
 
-// Builder provides a fluent interface for creating DDEX ERN 4.3 messages
+// Builder provides a fluent interface for creating DDEX ERN 3.8 messages
 type Builder struct {
 	Message *NewReleaseMessage
 }
 
-// NewDDEXBuilder creates a new builder for ERN 4.3 messages
+// NewDDEXBuilder creates a new builder for ERN 3.8 messages
 func NewDDEXBuilder() *Builder {
 	return &Builder{
 		Message: &NewReleaseMessage{
 			XmlnsErn:                XmlnsErn,
 			XmlnsXsi:                XmlnsXsi,
 			XsiSchemaLocation:       XsiSchemaLocation,
+			MessageSchemaVersionId:  MessageSchemaVersionId,
 			ReleaseProfileVersionId: "Video",
 			LanguageAndScriptCode:   "en",
-			AvsVersionId:            "3",
-			PartyList:               &PartyList{},
 			ResourceList:            &ResourceList{},
 			ReleaseList:             &ReleaseList{},
 			DealList:                &DealList{},
@@ -80,16 +79,11 @@ func (b *Builder) AddYouTubeContentIDRecipient() *Builder {
 	return b.AddRecipient("PADPIDA2015120100H", "YouTube_ContentID")
 }
 
-// AddParty adds a party (artist, label, etc.) to the party list
-func (b *Builder) AddParty(reference, fullName, fullNameIndexed string) *Builder {
-	var party Party
-	if fullNameIndexed != "" {
-		party = *NewPartyWithIndexedName(reference, fullName, fullNameIndexed)
-	} else {
-		party = *NewParty(reference, fullName)
-	}
-
-	b.Message.PartyList.Party = append(b.Message.PartyList.Party, party)
+// WithUpdateIndicator sets the update indicator
+// Valid values: "OriginalMessage" or "UpdateMessage"
+// Note: This element is deprecated in ERN 3.8
+func (b *Builder) WithUpdateIndicator(indicator string) *Builder {
+	b.Message.UpdateIndicator = indicator
 	return b
 }
 
@@ -113,7 +107,10 @@ func (b *Builder) AddVideo(resourceRef, videoType string) *VideoBuilder {
 func (b *Builder) AddImage(resourceRef, imageType string) *ImageBuilder {
 	image := &Image{
 		ResourceReference: resourceRef,
-		Type:              imageType,
+	}
+
+	if imageType != "" {
+		image.ImageType = &ImageType{Value: imageType}
 	}
 
 	b.Message.ResourceList.Image = append(b.Message.ResourceList.Image, *image)
@@ -129,7 +126,10 @@ func (b *Builder) AddImage(resourceRef, imageType string) *ImageBuilder {
 func (b *Builder) AddRelease(releaseRef, releaseType string) *ReleaseBuilder {
 	release := &Release{
 		ReleaseReference: releaseRef,
-		ReleaseType:      releaseType,
+	}
+
+	if releaseType != "" {
+		release.ReleaseType = []ReleaseType{{Value: releaseType}}
 	}
 
 	b.Message.ReleaseList.Release = append(b.Message.ReleaseList.Release, *release)
@@ -187,43 +187,79 @@ func (b *Builder) WriteToFile(filename string) error {
 
 // VideoBuilder provides fluent interface for building video resources
 type VideoBuilder struct {
-	builder *Builder
-	video   *Video
+	builder                 *Builder
+	video                   *Video
+	currentTerritoryDetails *VideoDetailsByTerritory
+	currentTerritoryIndex   int
 }
 
-// WithTitle sets the video title
-func (vb *VideoBuilder) WithTitle(title, subtitle string) *VideoBuilder {
-	vb.video.DisplayTitleText = &DisplayTitleText{
-		Value:                   title,
-		ApplicableTerritoryCode: "Worldwide",
-		LanguageAndScriptCode:   "en",
-		IsDefault:               true,
+// ensureTerritory ensures there's a territory to work with (defaults to Worldwide)
+func (vb *VideoBuilder) ensureTerritory() {
+	if vb.currentTerritoryDetails == nil {
+		vb.WithTerritory("Worldwide")
+	}
+}
+
+// WithTerritory creates or switches to a territory section
+func (vb *VideoBuilder) WithTerritory(territoryCode string) *VideoBuilder {
+	// Check if territory already exists
+	for i, details := range vb.video.VideoDetailsByTerritory {
+		for _, code := range details.TerritoryCode {
+			if code == territoryCode {
+				vb.currentTerritoryDetails = &vb.video.VideoDetailsByTerritory[i]
+				vb.currentTerritoryIndex = i
+				return vb
+			}
+		}
 	}
 
-	displayTitle := &DisplayTitle{
-		TitleText: []TitleText{{Value: title}},
+	// Create new territory details
+	newDetails := VideoDetailsByTerritory{
+		TerritoryCode: []string{territoryCode},
 	}
-	if subtitle != "" {
-		displayTitle.TitleText = append(displayTitle.TitleText, TitleText{Value: subtitle, TitleType: "SubTitle"})
-	}
-	vb.video.DisplayTitle = displayTitle
+	vb.video.VideoDetailsByTerritory = append(vb.video.VideoDetailsByTerritory, newDetails)
+	vb.currentTerritoryIndex = len(vb.video.VideoDetailsByTerritory) - 1
+	vb.currentTerritoryDetails = &vb.video.VideoDetailsByTerritory[vb.currentTerritoryIndex]
 
 	return vb
 }
 
-// WithDisplayArtistName sets the display artist name for the video
-func (vb *VideoBuilder) WithDisplayArtistName(artistName, territoryCode string) *VideoBuilder {
-	vb.video.DisplayArtistName = append(vb.video.DisplayArtistName, DisplayArtistNameWithOriginalLanguage{
-		Value:                   artistName,
-		ApplicableTerritoryCode: territoryCode,
+// WithTitle sets the video title (goes to territory details in ERN 3.8)
+func (vb *VideoBuilder) WithTitle(title, subtitle string) *VideoBuilder {
+	vb.ensureTerritory()
+
+	// Add title to territory details
+	titleStruct := Title{
+		TitleText: title,
+	}
+	if subtitle != "" {
+		titleStruct.SubTitle = subtitle
+	}
+	vb.currentTerritoryDetails.Title = append(vb.currentTerritoryDetails.Title, titleStruct)
+
+	return vb
+}
+
+// WithDisplayArtistName sets the display artist name for the video (ERN 3.8 - territory specific)
+func (vb *VideoBuilder) WithDisplayArtistName(artistName, languageCode string) *VideoBuilder {
+	vb.ensureTerritory()
+
+	if languageCode == "" {
+		languageCode = "en"
+	}
+	vb.currentTerritoryDetails.DisplayArtistName = append(vb.currentTerritoryDetails.DisplayArtistName, DisplayArtistName{
+		Value:                 artistName,
+		LanguageAndScriptCode: languageCode,
 	})
 	return vb
 }
 
-// WithArtist adds a display artist reference to the video
+// WithArtist adds a display artist reference to the video (territory specific)
 func (vb *VideoBuilder) WithArtist(partyRef, role string, sequence int) *VideoBuilder {
+	vb.ensureTerritory()
+
 	if partyRef != "" {
-		vb.video.DisplayArtist = append(vb.video.DisplayArtist, DisplayArtist{
+		vb.currentTerritoryDetails.DisplayArtist = append(vb.currentTerritoryDetails.DisplayArtist, DisplayArtist{
 			ArtistPartyReference: partyRef,
 			DisplayArtistRole:    role,
 			SequenceNumber:       sequence,
@@ -233,31 +269,34 @@ func (vb *VideoBuilder) WithArtist(partyRef, role string, sequence int) *VideoBu
 	return vb
 }
 
-// WithContributor adds a contributor to the video resource
+// WithContributor adds a contributor to the video resource (territory specific)
 // role can be multiple values like "Producer", "Director", "Cinematographer", etc.
 func (vb *VideoBuilder) WithContributor(partyRef string, roles []string, sequence int) *VideoBuilder {
+	vb.ensureTerritory()
+
 	if partyRef != "" && len(roles) > 0 {
-		vb.video.Contributor = append(vb.video.Contributor, Contributor{
-			ContributorPartyReference: partyRef,
-			Role:                      roles,
-			SequenceNumber:            sequence,
+		vb.currentTerritoryDetails.ResourceContributor = append(vb.currentTerritoryDetails.ResourceContributor, ResourceContributor{
+			PartyReference: partyRef,
+			Role:           roles,
 		})
 	}
 
 	return vb
 }
 
-// WithRightsController sets the rights controller
+// WithRightsController sets the rights controller (territory specific)
 func (vb *VideoBuilder) WithRightsController(partyRef string, percentage float64, territories []string) *VideoBuilder {
+	vb.ensureTerritory()
+
 	// If no territories provided, default to Worldwide
 	if len(territories) == 0 {
 		territories = []string{"Worldwide"}
 	}
 
-	vb.video.ResourceRightsController = append(vb.video.ResourceRightsController, ResourceRightsController{
-		RightsControllerPartyReference: partyRef,
-		RightsControlType:              "RightsController",
-		RightSharePercentage:           fmt.Sprintf("%.2f", percentage),
+	vb.currentTerritoryDetails.RightsController = append(vb.currentTerritoryDetails.RightsController, RightsController{
+		PartyReference:       partyRef,
+		Role:                 []string{"RightsController"},
+		RightSharePercentage: fmt.Sprintf("%.2f", percentage),
 		DelegatedUsageRights: []DelegatedUsageRights{
 			{
 				UseType:                     []string{"UserMakeAvailableUserProvided"},
@@ -269,111 +308,118 @@ func (vb *VideoBuilder) WithRightsController(partyRef string, percentage float64
 	return vb
 }
 
-// WithDuration sets the video duration (e.g., "PT3M10S")
+// WithDuration sets the video duration (e.g., "PT3M10S") - at video level, not territory
 func (vb *VideoBuilder) WithDuration(duration string) *VideoBuilder {
 	vb.video.Duration = duration
 	return vb
 }
 
-// WithCreationDate sets the creation date
+// WithCreationDate sets the creation date - at video level, not territory
 func (vb *VideoBuilder) WithCreationDate(date string, isApproximate bool) *VideoBuilder {
-	vb.video.CreationDate = &CreationDate{
+	vb.video.CreationDate = &EventDate{
 		Value:         date,
 		IsApproximate: isApproximate,
 	}
 	return vb
 }
 
-// WithParentalWarning sets the parental warning type
+// WithParentalWarning sets the parental warning type (territory specific)
 func (vb *VideoBuilder) WithParentalWarning(warningType string) *VideoBuilder {
-	vb.video.ParentalWarningType = warningType
+	vb.ensureTerritory()
+
+	vb.currentTerritoryDetails.ParentalWarningType = append(vb.currentTerritoryDetails.ParentalWarningType, warningType)
 	return vb
 }
 
-// WithPLine sets the P-Line information
+// WithPLine sets the P-Line information for ERN 3.8 (territory specific)
 func (vb *VideoBuilder) WithPLine(year int, text string) *VideoBuilder {
-	if len(vb.video.VideoEdition) == 0 {
-		vb.video.VideoEdition = append(vb.video.VideoEdition, VideoEdition{})
-	}
+	vb.ensureTerritory()
 
-	vb.video.VideoEdition[0].PLine = []PLine{
-		{Year: year, PLineText: text},
-	}
-
+	vb.currentTerritoryDetails.PLine = append(vb.currentTerritoryDetails.PLine, PLine{
+		Year:      year,
+		PLineText: text,
+	})
 	return vb
 }
 
-// WithTechnicalDetails adds technical details and file URI
+// WithCLine sets the C-Line information for ERN 3.8 (territory specific)
+func (vb *VideoBuilder) WithCLine(year int, text string) *VideoBuilder {
+	vb.ensureTerritory()
+
+	vb.currentTerritoryDetails.CLine = append(vb.currentTerritoryDetails.CLine, CLine{
+		Year:      year,
+		CLineText: text,
+	})
+	return vb
+}
+
+// WithGenre adds genre information (territory specific)
+func (vb *VideoBuilder) WithGenre(genreText, subGenre string) *VideoBuilder {
+	vb.ensureTerritory()
+
+	genre := Genre{
+		GenreText: genreText,
+	}
+	if subGenre != "" {
+		genre.SubGenre = subGenre
+	}
+	vb.currentTerritoryDetails.Genre = append(vb.currentTerritoryDetails.Genre, genre)
+	return vb
+}
+
+// WithTechnicalDetails adds technical details and file URI for ERN 3.8 (territory specific)
 func (vb *VideoBuilder) WithTechnicalDetails(techRef, fileURI string) *VideoBuilder {
-	if len(vb.video.VideoEdition) == 0 {
-		vb.video.VideoEdition = append(vb.video.VideoEdition, VideoEdition{})
-	}
+	vb.ensureTerritory()
 
-	vb.video.VideoEdition[0].TechnicalDetails = []TechnicalVideoDetails{
-		{
-			TechnicalResourceDetailsReference: techRef,
-			DeliveryFile: []AudioVisualDeliveryFile{
-				{
-					Type: "AudioVisualFile",
-					File: File{
-						URI: fileURI,
-					},
-				},
-			},
+	vb.currentTerritoryDetails.TechnicalVideoDetails = append(vb.currentTerritoryDetails.TechnicalVideoDetails, TechnicalVideoDetails{
+		TechnicalResourceDetailsReference: techRef,
+		File: &File{
+			URI: fileURI,
 		},
-	}
-
+	})
 	return vb
 }
 
-// WithISRC sets the ISRC for the video
+// WithISRC sets the ISRC for the video in ERN 3.8 - at video level, not territory
 func (vb *VideoBuilder) WithISRC(isrc string) *VideoBuilder {
-	if len(vb.video.VideoEdition) == 0 {
-		vb.video.VideoEdition = append(vb.video.VideoEdition, VideoEdition{})
-	}
-
-	vb.video.VideoEdition[0].ResourceId = append(vb.video.VideoEdition[0].ResourceId, VideoId{
+	vb.video.VideoId = append(vb.video.VideoId, VideoId{
 		ISRC: isrc,
 	})
-
 	return vb
 }
 
-// AddKeywords adds keywords for enhanced search and display
+// AddKeywords adds keywords for enhanced search and display (ERN 3.8 - territory specific)
 func (vb *VideoBuilder) AddKeywords(keywords ...string) *VideoBuilder {
+	vb.ensureTerritory()
+
 	for _, keyword := range keywords {
-		vb.video.Keywords = append(vb.video.Keywords, Keywords{
-			Value:                   keyword,
-			ApplicableTerritoryCode: "Worldwide",
+		vb.currentTerritoryDetails.Keywords = append(vb.currentTerritoryDetails.Keywords, Keywords{
+			Value: keyword,
 		})
 	}
 	return vb
 }
 
-// AddKeywordsWithTerritory adds keywords with specific territory and language
-func (vb *VideoBuilder) AddKeywordsWithTerritory(territoryCode, languageCode string, keywords ...string) *VideoBuilder {
+// AddKeywordsWithLanguage adds keywords with specific language (ERN 3.8 - territory specific)
+func (vb *VideoBuilder) AddKeywordsWithLanguage(languageCode string, keywords ...string) *VideoBuilder {
+	vb.ensureTerritory()
+
 	for _, keyword := range keywords {
-		vb.video.Keywords = append(vb.video.Keywords, Keywords{
-			Value:                   keyword,
-			ApplicableTerritoryCode: territoryCode,
-			LanguageAndScriptCode:   languageCode,
+		vb.currentTerritoryDetails.Keywords = append(vb.currentTerritoryDetails.Keywords, Keywords{
+			Value:                 keyword,
+			LanguageAndScriptCode: languageCode,
 		})
 	}
 	return vb
 }
 
-// AddProprietaryId adds a proprietary ID (e.g., YouTube channel ID)
+// AddProprietaryId adds a proprietary ID (e.g., YouTube channel ID) for ERN 3.8 - at video level
 func (vb *VideoBuilder) AddProprietaryId(namespace, value string) *VideoBuilder {
-	if len(vb.video.VideoEdition) == 0 {
-		vb.video.VideoEdition = append(vb.video.VideoEdition, VideoEdition{})
-	}
-
-	vb.video.VideoEdition[0].ResourceId = append(vb.video.VideoEdition[0].ResourceId, VideoId{
+	vb.video.VideoId = append(vb.video.VideoId, VideoId{
 		ProprietaryId: []ProprietaryId{
 			{Namespace: namespace, Value: value},
 		},
 	})
-
 	return vb
 }
 
@@ -384,13 +430,46 @@ func (vb *VideoBuilder) Done() *Builder {
 
 // ImageBuilder provides fluent interface for building image resources
 type ImageBuilder struct {
-	builder *Builder
-	image   *Image
+	builder                 *Builder
+	image                   *Image
+	currentTerritoryDetails *ImageDetailsByTerritory
+	currentTerritoryIndex   int
 }
 
-// WithProprietaryId adds a proprietary ID to the image
+// ensureTerritory ensures there's a territory to work with (defaults to Worldwide)
+func (ib *ImageBuilder) ensureTerritory() {
+	if ib.currentTerritoryDetails == nil {
+		ib.WithTerritory("Worldwide")
+	}
+}
+
+// WithTerritory creates or switches to a territory section
+func (ib *ImageBuilder) WithTerritory(territoryCode string) *ImageBuilder {
+	// Check if territory already exists
+	for i, details := range ib.image.ImageDetailsByTerritory {
+		for _, code := range details.TerritoryCode {
+			if code == territoryCode {
+				ib.currentTerritoryDetails = &ib.image.ImageDetailsByTerritory[i]
+				ib.currentTerritoryIndex = i
+				return ib
+			}
+		}
+	}
+
+	// Create new territory details
+	newDetails := ImageDetailsByTerritory{
+		TerritoryCode: []string{territoryCode},
+	}
+	ib.image.ImageDetailsByTerritory = append(ib.image.ImageDetailsByTerritory, newDetails)
+	ib.currentTerritoryIndex = len(ib.image.ImageDetailsByTerritory) - 1
+	ib.currentTerritoryDetails = &ib.image.ImageDetailsByTerritory[ib.currentTerritoryIndex]
+
+	return ib
+}
+
+// WithProprietaryId adds a proprietary ID to the image (image level, not territory)
 func (ib *ImageBuilder) WithProprietaryId(namespace, value string) *ImageBuilder {
-	ib.image.ResourceId = []ImageId{
+	ib.image.ImageId = []ImageId{
 		{
 			ProprietaryId: []ProprietaryId{
 				{Namespace: namespace, Value: value},
@@ -400,22 +479,47 @@ func (ib *ImageBuilder) WithProprietaryId(namespace, value string) *ImageBuilder
 	return ib
 }
 
-// WithParentalWarning sets the parental warning type
-func (ib *ImageBuilder) WithParentalWarning(warningType string) *ImageBuilder {
-	ib.image.ParentalWarningType = warningType
+// WithCreationDate sets the creation date - at image level, not territory
+func (ib *ImageBuilder) WithCreationDate(date string, isApproximate bool) *ImageBuilder {
+	ib.image.CreationDate = &EventDate{
+		Value:         date,
+		IsApproximate: isApproximate,
+	}
 	return ib
 }
 
-// WithTechnicalDetails adds technical details and file URI
+// WithParentalWarning sets the parental warning type (territory specific)
+func (ib *ImageBuilder) WithParentalWarning(warningType string) *ImageBuilder {
+	ib.ensureTerritory()
+
+	ib.currentTerritoryDetails.ParentalWarningType = append(ib.currentTerritoryDetails.ParentalWarningType, warningType)
+	return ib
+}
+
+// WithCLine sets the C-Line information (territory specific)
+func (ib *ImageBuilder) WithCLine(year int, text string) *ImageBuilder {
+	ib.ensureTerritory()
+
+	ib.currentTerritoryDetails.CLine = append(ib.currentTerritoryDetails.CLine, CLine{
+		Year:      year,
+		CLineText: text,
+	})
+	return ib
+}
+
+// Note: RightsController is not part of ImageDetailsByTerritory in ERN 3.8
+// Rights information for images should be managed at the Image resource level, not territory level
+
+// WithTechnicalDetails adds technical details and file URI for images (ERN 3.8 - territory specific)
 func (ib *ImageBuilder) WithTechnicalDetails(techRef, fileURI string) *ImageBuilder {
-	ib.image.TechnicalDetails = []TechnicalImageDetails{
-		{
-			TechnicalResourceDetailsReference: techRef,
-			File: File{
-				URI: fileURI,
-			},
+	ib.ensureTerritory()
+
+	ib.currentTerritoryDetails.TechnicalImageDetails = append(ib.currentTerritoryDetails.TechnicalImageDetails, TechnicalImageDetails{
+		TechnicalResourceDetailsReference: techRef,
+		File: &File{
+			URI: fileURI,
 		},
-	}
+	})
 	return ib
 }
 
@@ -426,75 +530,116 @@ func (ib *ImageBuilder) Done() *Builder {
 
 // ReleaseBuilder provides fluent interface for building releases
 type ReleaseBuilder struct {
-	builder *Builder
-	release *Release
+	builder                 *Builder
+	release                 *Release
+	currentTerritoryDetails *ReleaseDetailsByTerritory
+	currentTerritoryIndex   int
 }
 
-// WithTitle sets the release title
+// WithTitle sets the reference title for the release (mandatory in ERN 3.8)
 func (rb *ReleaseBuilder) WithTitle(title, subtitle string) *ReleaseBuilder {
-	rb.release.DisplayTitleText = []DisplayTitleText{
-		{
-			Value:                   title,
-			ApplicableTerritoryCode: "Worldwide",
-			LanguageAndScriptCode:   "en",
-			IsDefault:               true,
-		},
+	rb.release.ReferenceTitle = &ReferenceTitle{
+		TitleText: title,
+		SubTitle:  subtitle,
 	}
-
-	displayTitle := DisplayTitle{
-		TitleText: []TitleText{{Value: title}},
-	}
-	if subtitle != "" {
-		displayTitle.TitleText = append(displayTitle.TitleText, TitleText{Value: subtitle, TitleType: "SubTitle"})
-	}
-	rb.release.DisplayTitle = append(rb.release.DisplayTitle, displayTitle)
-
 	return rb
 }
 
-// WithDisplayArtistName sets the display artist name for the release
-func (rb *ReleaseBuilder) WithDisplayArtistName(artistName, territoryCode string) *ReleaseBuilder {
-	rb.release.DisplayArtistName = append(rb.release.DisplayArtistName, DisplayArtistNameWithOriginalLanguage{
-		Value:                   artistName,
-		ApplicableTerritoryCode: territoryCode,
+// WithTerritory creates or switches to a territory-specific details section
+// This is mandatory in ERN 3.8 - at least one territory must be specified
+func (rb *ReleaseBuilder) WithTerritory(territoryCode string) *ReleaseBuilder {
+	// Create new territory details
+	territoryDetails := ReleaseDetailsByTerritory{
+		TerritoryCode: []string{territoryCode},
+	}
+	rb.release.ReleaseDetailsByTerritory = append(rb.release.ReleaseDetailsByTerritory, territoryDetails)
+	rb.currentTerritoryIndex = len(rb.release.ReleaseDetailsByTerritory) - 1
+	rb.currentTerritoryDetails = &rb.release.ReleaseDetailsByTerritory[rb.currentTerritoryIndex]
+	return rb
+}
+
+// ensureTerritory creates a default Worldwide territory if none exists
+func (rb *ReleaseBuilder) ensureTerritory() {
+	if rb.currentTerritoryDetails == nil {
+		rb.WithTerritory("Worldwide")
+	}
+}
+
+// WithDisplayArtistName sets the display artist name for the current territory
+func (rb *ReleaseBuilder) WithDisplayArtistName(artistName, languageCode string) *ReleaseBuilder {
+	rb.ensureTerritory()
+	if languageCode == "" {
+		languageCode = "en"
+	}
+	rb.currentTerritoryDetails.DisplayArtistName = append(rb.currentTerritoryDetails.DisplayArtistName, Name{
+		FullName:     artistName,
+		LanguageCode: languageCode,
 	})
 	return rb
 }
 
-// WithArtist adds a display artist reference to the release
+// WithArtist adds a display artist reference for the current territory
 func (rb *ReleaseBuilder) WithArtist(partyRef, role string, sequence int) *ReleaseBuilder {
+	rb.ensureTerritory()
 	if partyRef != "" {
-		rb.release.DisplayArtist = append(rb.release.DisplayArtist, DisplayArtist{
+		rb.currentTerritoryDetails.DisplayArtist = append(rb.currentTerritoryDetails.DisplayArtist, DisplayArtist{
 			ArtistPartyReference: partyRef,
 			DisplayArtistRole:    role,
 			SequenceNumber:       sequence,
 		})
 	}
-
 	return rb
 }
 
-// WithLabel sets the release label
-func (rb *ReleaseBuilder) WithLabel(labelPartyRef, territoryCode string) *ReleaseBuilder {
-	rb.release.ReleaseLabelReference = append(rb.release.ReleaseLabelReference, ReleaseLabelReference{
-		Value:                   labelPartyRef,
-		ApplicableTerritoryCode: territoryCode,
+// WithLabel adds a label name for the current territory
+func (rb *ReleaseBuilder) WithLabel(labelName, languageCode string) *ReleaseBuilder {
+	rb.ensureTerritory()
+	if languageCode == "" {
+		languageCode = "en"
+	}
+	rb.currentTerritoryDetails.LabelName = append(rb.currentTerritoryDetails.LabelName, LabelName{
+		Value:                 labelName,
+		LanguageAndScriptCode: languageCode,
 	})
 	return rb
 }
 
-// WithPLine adds P-Line information
+// WithPLine adds P-Line information (can be global or territory-specific)
 func (rb *ReleaseBuilder) WithPLine(year int, text string) *ReleaseBuilder {
-	rb.release.PLine = append(rb.release.PLine, PLine{
+	pline := PLine{
+		Year:      year,
+		PLineText: text,
+	}
+	// Add to global release
+	rb.release.PLine = append(rb.release.PLine, pline)
+	return rb
+}
+
+// WithTerritoryPLine adds P-Line information for the current territory
+func (rb *ReleaseBuilder) WithTerritoryPLine(year int, text string) *ReleaseBuilder {
+	rb.ensureTerritory()
+	rb.currentTerritoryDetails.PLine = append(rb.currentTerritoryDetails.PLine, PLine{
 		Year:      year,
 		PLineText: text,
 	})
 	return rb
 }
 
-// WithCLine adds C-Line information
+// WithCLine adds C-Line information (can be global or territory-specific)
 func (rb *ReleaseBuilder) WithCLine(year int, text string) *ReleaseBuilder {
-	rb.release.CLine = append(rb.release.CLine, CLine{
+	cline := CLine{
+		Year:      year,
+		CLineText: text,
+	}
+	// Add to global release
+	rb.release.CLine = append(rb.release.CLine, cline)
+	return rb
+}
+
+// WithTerritoryCLine adds C-Line information for the current territory
+func (rb *ReleaseBuilder) WithTerritoryCLine(year int, text string) *ReleaseBuilder {
+	rb.ensureTerritory()
+	rb.currentTerritoryDetails.CLine = append(rb.currentTerritoryDetails.CLine, CLine{
 		Year:      year,
 		CLineText: text,
 	})
@@ -507,115 +652,101 @@ func (rb *ReleaseBuilder) WithDuration(duration string) *ReleaseBuilder {
 	return rb
 }
 
-// WithReleaseDate sets both ReleaseDate and OriginalReleaseDate to the same date value
-// Date should be in ISO 8601 format (YYYY, YYYY-MM, or YYYY-MM-DD)
+// WithReleaseDate sets ReleaseDate for the current territory
 func (rb *ReleaseBuilder) WithReleaseDate(date string) *ReleaseBuilder {
-	releaseDateEntry := EventDateWithDefault{
+	rb.ensureTerritory()
+	rb.currentTerritoryDetails.ReleaseDate = &EventDate{
 		XMLName: xml.Name{Local: "ReleaseDate"},
 		Value:   date,
 	}
-	originalReleaseDateEntry := EventDateWithDefault{
+	return rb
+}
+
+// WithOriginalReleaseDate sets OriginalReleaseDate for the current territory
+func (rb *ReleaseBuilder) WithOriginalReleaseDate(date string) *ReleaseBuilder {
+	rb.ensureTerritory()
+	rb.currentTerritoryDetails.OriginalReleaseDate = &EventDate{
 		XMLName: xml.Name{Local: "OriginalReleaseDate"},
 		Value:   date,
 	}
-
-	rb.release.ReleaseDate = append(rb.release.ReleaseDate, releaseDateEntry)
-	rb.release.OriginalReleaseDate = append(rb.release.OriginalReleaseDate, originalReleaseDateEntry)
 	return rb
 }
 
-// WithGenre adds genre information
-func (rb *ReleaseBuilder) WithGenre(genreText, territoryCode string) *ReleaseBuilder {
-	rb.release.DisplayGenre = append(rb.release.DisplayGenre, DisplayGenre{
-		GenreText:               genreText,
-		ApplicableTerritoryCode: territoryCode,
+// WithGenre adds genre information for the current territory
+func (rb *ReleaseBuilder) WithGenre(genreText string) *ReleaseBuilder {
+	rb.ensureTerritory()
+	rb.currentTerritoryDetails.Genre = append(rb.currentTerritoryDetails.Genre, Genre{
+		GenreText: genreText,
 	})
 	return rb
 }
 
-// WithGenreAndSubGenre adds genre information with a subgenre
-func (rb *ReleaseBuilder) WithGenreAndSubGenre(genreText, subGenre, territoryCode string) *ReleaseBuilder {
-	rb.release.DisplayGenre = append(rb.release.DisplayGenre, DisplayGenre{
-		GenreText:               genreText,
-		SubGenre:                subGenre,
-		ApplicableTerritoryCode: territoryCode,
+// WithGenreAndSubGenre adds genre information with a subgenre for the current territory
+func (rb *ReleaseBuilder) WithGenreAndSubGenre(genreText, subGenre string) *ReleaseBuilder {
+	rb.ensureTerritory()
+	rb.currentTerritoryDetails.Genre = append(rb.currentTerritoryDetails.Genre, Genre{
+		GenreText: genreText,
+		SubGenre:  subGenre,
 	})
 	return rb
 }
 
-// WithParentalWarning sets the parental warning type
+// WithParentalWarning sets the parental warning type for the current territory
 func (rb *ReleaseBuilder) WithParentalWarning(warningType string) *ReleaseBuilder {
-	rb.release.ParentalWarningType = warningType
+	rb.ensureTerritory()
+	rb.currentTerritoryDetails.ParentalWarningType = append(rb.currentTerritoryDetails.ParentalWarningType, ParentalWarningType{
+		Value: warningType,
+	})
 	return rb
 }
 
-// WithAvRating adds an AvRating to the release
-// Common use case for YouTube: WithAvRating("MadeForKids", "UserDefined", "YOUTUBE")
-func (rb *ReleaseBuilder) WithAvRating(ratingText, agencyValue, agencyNamespace string) *ReleaseBuilder {
+// WithAvRating adds an AvRating for the current territory
+func (rb *ReleaseBuilder) WithAvRating(ratingText, agencyValue string) *ReleaseBuilder {
+	rb.ensureTerritory()
 	avRating := AvRating{
-		RatingText: ratingText,
-		RatingAgency: RatingAgency{
-			Value:     agencyValue,
-			Namespace: agencyNamespace,
-		},
+		RatingText:   ratingText,
+		RatingAgency: agencyValue,
 	}
-
-	rb.release.AvRating = append(rb.release.AvRating, avRating)
+	rb.currentTerritoryDetails.AvRating = append(rb.currentTerritoryDetails.AvRating, avRating)
 	return rb
 }
 
 // WithMadeForKids is a convenience method to set the YouTube MadeForKids rating
 func (rb *ReleaseBuilder) WithMadeForKids() *ReleaseBuilder {
-	return rb.WithAvRating("MadeForKids", "UserDefined", "YOUTUBE")
+	return rb.WithAvRating("MadeForKids", "UserDefined")
 }
 
-// WithMarketingComment adds a marketing comment to the release
-func (rb *ReleaseBuilder) WithMarketingComment(comment, territoryCode, languageCode string) *ReleaseBuilder {
-	commentEntry := MarketingComment{
-		Value:                   comment,
-		ApplicableTerritoryCode: territoryCode,
-		LanguageAndScriptCode:   languageCode,
+// WithMarketingComment adds a marketing comment for the current territory
+func (rb *ReleaseBuilder) WithMarketingComment(comment, languageCode string) *ReleaseBuilder {
+	rb.ensureTerritory()
+	if languageCode == "" {
+		languageCode = "en"
 	}
-
-	rb.release.MarketingComment = append(rb.release.MarketingComment, commentEntry)
+	rb.currentTerritoryDetails.MarketingComment = &Comment{
+		Value:                 comment,
+		LanguageAndScriptCode: languageCode,
+	}
 	return rb
 }
 
-// WithMarketingCommentSimple adds a marketing comment to the release with worldwide territory
-func (rb *ReleaseBuilder) WithMarketingCommentSimple(comment string) *ReleaseBuilder {
-	return rb.WithMarketingComment(comment, "Worldwide", "")
-}
-
-// WithKeywords adds keywords to the release
-func (rb *ReleaseBuilder) WithKeywords(keywords, territoryCode, languageCode string) *ReleaseBuilder {
+// WithKeywords adds keywords for the current territory
+func (rb *ReleaseBuilder) WithKeywords(keywords, languageCode string) *ReleaseBuilder {
+	rb.ensureTerritory()
+	if languageCode == "" {
+		languageCode = "en"
+	}
 	keywordsEntry := Keywords{
-		Value:                   keywords,
-		ApplicableTerritoryCode: territoryCode,
-		LanguageAndScriptCode:   languageCode,
+		Value:                 keywords,
+		LanguageAndScriptCode: languageCode,
 	}
-
-	rb.release.Keywords = append(rb.release.Keywords, keywordsEntry)
+	rb.currentTerritoryDetails.Keywords = append(rb.currentTerritoryDetails.Keywords, keywordsEntry)
 	return rb
 }
 
-// WithKeywordsSimple adds keywords to the release with worldwide territory
-func (rb *ReleaseBuilder) WithKeywordsSimple(keywords string) *ReleaseBuilder {
-	return rb.WithKeywords(keywords, "Worldwide", "")
-}
-
-// WithContainsAI sets the AI contribution type for the release
-// Valid values typically include: "AIGenerated", "AIAssisted", "AITraining", "NoAI"
-func (rb *ReleaseBuilder) WithContainsAI(containsAI string) *ReleaseBuilder {
-	rb.release.ContainsAI = containsAI
-	return rb
-}
-
-// WithICPN sets the ICPN identifier for the release
+// WithICPN sets the ICPN identifier for the release (ERN 3.8)
 func (rb *ReleaseBuilder) WithICPN(icpn string) *ReleaseBuilder {
 	rb.release.ReleaseId = append(rb.release.ReleaseId, ReleaseId{
-		ICPN: &ICPN{
-			Value: icpn,
-		},
+		ICPN: icpn,
 	})
 	return rb
 }
@@ -643,19 +774,27 @@ func (rb *ReleaseBuilder) AddProprietaryId(namespace, value string) *ReleaseBuil
 	return rb
 }
 
-// AddRelatedResource adds a related resource to the release
-func (rb *ReleaseBuilder) AddRelatedResource(relationshipType, isrc string) *ReleaseBuilder {
-	rb.release.RelatedResource = append(rb.release.RelatedResource, RelatedResource{
-		ResourceRelationshipType: relationshipType,
-		ResourceId: RelatedResourceId{
-			ISRC: isrc,
-		},
+// AddReleaseResourceReference adds a resource reference to the release
+// In ERN 3.8, this is used at the Release level to reference resources
+func (rb *ReleaseBuilder) AddReleaseResourceReference(resourceRef string) *ReleaseBuilder {
+	rb.release.ReleaseResourceReference = append(rb.release.ReleaseResourceReference, resourceRef)
+	return rb
+}
+
+// AddRelatedRelease adds a related release for the current territory
+func (rb *ReleaseBuilder) AddRelatedRelease(relationshipType string, releaseId ReleaseId) *ReleaseBuilder {
+	rb.ensureTerritory()
+	rb.currentTerritoryDetails.RelatedRelease = append(rb.currentTerritoryDetails.RelatedRelease, RelatedRelease{
+		ReleaseRelationshipType: relationshipType,
+		ReleaseId:               releaseId,
 	})
 	return rb
 }
 
-// AddResourceGroup adds a resource group to the release
+// AddResourceGroup adds a resource group to the current territory
 func (rb *ReleaseBuilder) AddResourceGroup(titleText string, sequenceNumber int) *ResourceGroupBuilder {
+	rb.ensureTerritory()
+
 	group := ResourceGroup{
 		SequenceNumber: sequenceNumber,
 	}
@@ -666,12 +805,12 @@ func (rb *ReleaseBuilder) AddResourceGroup(titleText string, sequenceNumber int)
 		}
 	}
 
-	rb.release.ResourceGroup = append(rb.release.ResourceGroup, group)
-	groupIndex := len(rb.release.ResourceGroup) - 1
+	rb.currentTerritoryDetails.ResourceGroup = append(rb.currentTerritoryDetails.ResourceGroup, group)
+	groupIndex := len(rb.currentTerritoryDetails.ResourceGroup) - 1
 
 	return &ResourceGroupBuilder{
 		releaseBuilder: rb,
-		group:          &rb.release.ResourceGroup[groupIndex],
+		group:          &rb.currentTerritoryDetails.ResourceGroup[groupIndex],
 	}
 }
 
@@ -748,25 +887,25 @@ type DealBuilder struct {
 	deal               *Deal
 }
 
-// WithTerritory sets the deal territory
-// WithTerritories sets the deal territories
-func (db *DealBuilder) WithTerritories(territoryCodes []string) *DealBuilder {
+// WithTerritories sets the deal territories for ERN 3.8 (can be called multiple times)
+func (db *DealBuilder) WithTerritory(territoryCode string) *DealBuilder {
 	if db.deal.DealTerms == nil {
 		db.deal.DealTerms = &DealTerms{}
 	}
-	db.deal.DealTerms.TerritoryCode = territoryCodes
+	db.deal.DealTerms.TerritoryCode = append(db.deal.DealTerms.TerritoryCode, territoryCode)
 	return db
 }
 
 // WithValidityPeriod sets the deal validity period with a start date (YYYY-MM-DD)
-func (db *DealBuilder) WithValidityPeriod(startDate string) *DealBuilder {
+func (db *DealBuilder) WithValidityPeriod(startDate string, endDate string) *DealBuilder {
 	if db.deal.DealTerms == nil {
 		db.deal.DealTerms = &DealTerms{}
 	}
 
-	db.deal.DealTerms.ValidityPeriod = &ValidityPeriod{
+	db.deal.DealTerms.ValidityPeriod = append(db.deal.DealTerms.ValidityPeriod, ValidityPeriod{
 		StartDate: startDate,
-	}
+		EndDate:   endDate,
+	})
 
 	return db
 }
@@ -777,15 +916,15 @@ func (db *DealBuilder) WithValidityPeriodDateTime(startDateTime string) *DealBui
 		db.deal.DealTerms = &DealTerms{}
 	}
 
-	db.deal.DealTerms.ValidityPeriod = &ValidityPeriod{
+	db.deal.DealTerms.ValidityPeriod = append(db.deal.DealTerms.ValidityPeriod, ValidityPeriod{
 		StartDateTime: startDateTime,
-	}
+	})
 
 	return db
 }
 
-// AddCommercialModel adds a commercial model type
-func (db *DealBuilder) AddCommercialModel(modelType string) *DealBuilder {
+// WithCommercialModel adds a commercial model type for ERN 3.8 (can be called multiple times)
+func (db *DealBuilder) WithCommercialModel(modelType string) *DealBuilder {
 	if db.deal.DealTerms == nil {
 		db.deal.DealTerms = &DealTerms{}
 	}
@@ -793,23 +932,30 @@ func (db *DealBuilder) AddCommercialModel(modelType string) *DealBuilder {
 	return db
 }
 
-// AddUseType adds a use type
-func (db *DealBuilder) AddUseType(useType string) *DealBuilder {
+// WithUseType adds a use type for ERN 3.8 (can be called multiple times)
+func (db *DealBuilder) WithUseType(useType string) *DealBuilder {
 	if db.deal.DealTerms == nil {
 		db.deal.DealTerms = &DealTerms{}
 	}
-	db.deal.DealTerms.UseType = append(db.deal.DealTerms.UseType, useType)
+
+	// Ensure Usage array exists
+	if len(db.deal.DealTerms.Usage) == 0 {
+		db.deal.DealTerms.Usage = append(db.deal.DealTerms.Usage, Usage{})
+	}
+
+	// Add to the first Usage element's UseType array
+	db.deal.DealTerms.Usage[0].UseType = append(db.deal.DealTerms.Usage[0].UseType, useType)
 	return db
 }
 
-// WithRightsClaimPolicy sets the rights claim policy for the deal
+// WithRightsClaimPolicy adds a rights claim policy for the deal (can be called multiple times)
 func (db *DealBuilder) WithRightsClaimPolicy(policyType string) *DealBuilder {
 	if db.deal.DealTerms == nil {
 		db.deal.DealTerms = &DealTerms{}
 	}
-	db.deal.DealTerms.RightsClaimPolicy = &RightsClaimPolicy{
+	db.deal.DealTerms.RightsClaimPolicy = append(db.deal.DealTerms.RightsClaimPolicy, RightsClaimPolicy{
 		RightsClaimPolicyType: policyType,
-	}
+	})
 	return db
 }
 

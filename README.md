@@ -1,23 +1,27 @@
-# DDEX ERN 4.3 Go Package
+# DDEX ERN 3.8 Go Package
 
-A Go package for creating and parsing DDEX ERN 4.3 (Electronic Release Notification) messages, specifically optimized for YouTube content delivery.
+A Go package for creating and parsing DDEX ERN 3.8 (Electronic Release Notification) messages, specifically optimized for YouTube content delivery with Content ID support.
 
 ## Overview
 
-This package provides a fluent builder API for easily creating DDEX ERN 4.3 compliant XML messages for video releases. It's designed to simplify the process of generating complex DDEX messages with proper structure and validation.
+This package provides a fluent builder API for easily creating DDEX ERN 3.8 compliant XML messages for video releases. It's designed to simplify the process of generating complex DDEX messages with proper structure and validation for YouTube's Content ID system and streaming platform.
 
 ## Features
 
-- ✅ Full DDEX ERN 4.3 specification support
+- ✅ Full DDEX ERN 3.8.1 specification support
 - ✅ Fluent builder API for easy message construction
-- ✅ YouTube-specific configurations
+- ✅ YouTube-specific configurations (Content ID + Streaming)
+- ✅ Territory-based metadata organization
 - ✅ Type-safe Go structs with proper XML marshaling
 - ✅ Support for:
-  - Video resources with technical details
-  - Image resources (cover art, screenshots)
-  - Multiple parties (artists, labels, rights holders)
-  - Complex deal structures
-  - Territory-specific metadata
+  - Video resources with technical details and multiple identifiers
+  - Image resources (cover art, screenshots, thumbnails)
+  - Multiple titles (formal, display, translated)
+  - Complex deal structures (Content ID policies + streaming rights)
+  - Collection/playlist management
+  - Multiple contributors and artists
+  - Genre, keywords, and marketing metadata
+  - Rights controller and ownership information
 
 ## Installation
 
@@ -25,9 +29,9 @@ This package provides a fluent builder API for easily creating DDEX ERN 4.3 comp
 go get github.com/yourusername/ddex
 ```
 
-## Quick Start
+## Complete Example: YouTube Music Video with Content ID
 
-Here's a simple example creating a video single release for YouTube:
+This example demonstrates how to create the exact DDEX feed structure for YouTube with Content ID enabled. This matches the official YouTube DDEX XML sample format.
 
 ```go
 package main
@@ -41,261 +45,508 @@ func main() {
     // Create builder
     builder := ddex.NewDDEXBuilder()
 
-    // Set up message header
+    // ============================================================================
+    // MESSAGE HEADER with YouTube and Content ID recipients
+    // ============================================================================
     builder.WithMessageHeader(
-        "MSG001",           // Message ID
-        "THREAD001",        // Thread ID
-        "PADPIDA1234567",   // Your DPID
-        "My Label",         // Your name
-    ).AddYouTubeRecipient()
+        "",                           // MessageId (empty in sample)
+        "",                           // ThreadId (empty in sample)
+        "DPID_OF_THE_SENDER",        // Your DPID
+        "Name of sending party",      // Your company name
+    ).AddYouTubeRecipient().         // For making video available on YouTube (PADPIDA2013020802I)
+      AddYouTubeContentIDRecipient().// For enabling Content ID (PADPIDA2015120100H)
+      WithUpdateIndicator("OriginalMessage")
 
-    // Add artist party
-    builder.AddParty("P1", "Artist Name", "Name, Artist")
-
-    // Add video resource
+    // ============================================================================
+    // VIDEO RESOURCE
+    // ============================================================================
     builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
-        WithISRC("USXX12300001").
-        WithTitle("My Video Title", "Subtitle").
-        WithDisplayArtistName("Artist Name").
-        WithArtist("P1", "MainArtist", 1).
-        WithDuration("PT3M30S").
-        WithCreationDate("2024-01-01", false).
-        WithParentalWarning("NoAdviceAvailable").
-        WithTechnicalDetails("T1", "video.mp4").
-        Done()
-
-    // Add release
-    builder.AddRelease("R1", "VideoSingle").
-        WithUPC("1234567890123").
-        WithTitle("My Video Title", "").
-        WithDisplayArtistName("Artist Name").
-        WithArtist("P1", 1).
-        WithGenre("Pop", "Worldwide").
-        AddResourceGroup("", 1).
-        AddContentItem(1, "A1").
-        Done().
-        Done()
-
-    // Add deal
-    builder.AddDeal("R1").
+        // Add VideoId with ISRC and proprietary IDs
+        WithISRC("QZ6RS1700001").
+        AddProprietaryId("YOUTUBE:MV_ASSET_LABEL", "foobar_music_video_label").
+        AddProprietaryId("YOUTUBE:MV_CUSTOM_ID", "music_video_custom_001").
+        AddProprietaryId("YOUTUBE:CHANNEL_ID", "MyChannel").
+        AddProprietaryId("DPID:DPID_OF_THE_SENDER", "YourProprietaryID_001").
+        AddProprietaryId("YOUTUBE:AD_FORMAT", "AdFormatID").
+        
+        // Add IndirectVideoId (musical work)
+        WithIndirectVideoId("T1234567890"). // ISWC
+        
+        // Add ReferenceTitle (video-level, before territory details)
+        WithReferenceTitle("A little bit of Foo", "").
+        
+        // Add LanguageOfPerformance and Duration (video-level)
+        WithLanguageOfPerformance("en").
+        WithDuration("PT0H3M16S").
+        
+        // ============================================================================
+        // TERRITORY-SPECIFIC DETAILS (VideoDetailsByTerritory)
+        // ============================================================================
         WithTerritory("Worldwide").
-        WithValidityPeriod("2024-01-01").
-        AddCommercialModel("AdvertisementSupportedModel").
-        AddUseType("Stream").
+        
+        // Add three Title elements with different types and languages
+        WithTitle("A little bit of Foo", "").
+        WithTitleAttributes("en", "FormalTitle"). // First title: FormalTitle in English
+        
+        WithTitle("A little bit of Foo", "").
+        WithTitleAttributes("en", "DisplayTitle"). // Second title: DisplayTitle in English
+        
+        WithTitle("キャン・ユー・フィール．．．ザ・モンキー・クロー！", 
+                 "ライヴ・アット・武道館").
+        WithTitleAttributes("ja", "TranslatedTitle"). // Third title: TranslatedTitle in Japanese
+        
+        // Add DisplayArtist (inline party with name and role)
+        WithDisplayArtist("Jonny and the Føøbars", "MainArtist", 1).
+        
+        // Add ResourceContributor
+        WithResourceContributor("Jane Doe", []string{"Producer"}, 1).
+        
+        // Add IndirectResourceContributor
+        WithIndirectResourceContributor("Jonny Smith", []string{"Composer"}, 1).
+        
+        // Add DisplayArtistName (simple text)
+        WithDisplayArtistName("Jonny and the Føøbars", "").
+        
+        // Add LabelName
+        WithLabelName("Test Label", "DisplayLabelName").
+        
+        // Add RightsController (sets ownership on Music Video asset)
+        WithRightsController("Test Label", "DPID_OF_THE_SENDER", 
+                           []string{"RightsController"}, 100.00).
+        
+        // Add ResourceReleaseDate
+        WithResourceReleaseDate("2017-02-05").
+        
+        // Add PLine
+        WithPLine(2017, "(P) 2017 Test Label Inc.").
+        
+        // Add Genre
+        WithGenre("Hip Hop", "").
+        
+        // Add ParentalWarningType
+        WithParentalWarning("Explicit").
+        
+        // Add Keywords
+        AddKeywords("Keyword1", "Keyword2").
+        
+        // Add TechnicalVideoDetails with file information
+        WithTechnicalVideoDetails("T1", "QZ6RS1700004_01_01.mpeg", "resources/").
         Done()
 
-    // Write to file
-    if err := builder.WriteToFile("release.xml"); err != nil {
-        log.Fatal(err)
-    }
-}
-```
-
-## Complete Example: Video Single with Related Resource
-
-Here's a complete example that creates a video single with a related resource (matching the structure of a typical YouTube DDEX delivery):
-
-```go
-package main
-
-import (
-    "log"
-    "github.com/yourusername/ddex/pkg/ddex"
-)
-
-func main() {
-    // Create builder
-    builder := ddex.NewDDEXBuilder()
-
-    // Set up message header
-    builder.WithMessageHeader(
-        "VideoSingleTest",        // Message ID
-        "VideoSingleTest",        // Thread ID
-        "Your DPID",              // Your DPID
-        "Your party name",        // Your company name
-    ).AddYouTubeRecipient()
-
-    // Add parties (artist and label)
-    builder.AddParty("PJohnDoe", "John Doe", "Doe, John").
-        AddParty("PACME", "ACME music", "")
-
-    // Add video resource
-    builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
-        WithISRC("QZ6GL1732999").
-        WithTitle("Video display title", "Video subtitle").
-        WithDisplayArtistName("John Doe").
-        WithArtist("PJohnDoe", "MainArtist", 1).
-        WithRightsController("PACME", 100.00).
-        WithDuration("PT3M10S").
-        WithCreationDate("2023-01-01", true).
-        WithParentalWarning("NoAdviceAvailable").
-        WithPLine(2023, "(P) 2023 Some Pline text").
-        WithTechnicalDetails("T1", "vid.mpg").
-        AddProprietaryId("YOUTUBE:CHANNEL_ID", "UCQ0qe7vLz7uE_-sdtM9WB_w").
-        Done()
-
-    // Add image resource (video screen capture)
+    // ============================================================================
+    // IMAGE RESOURCE
+    // ============================================================================
     builder.AddImage("A2", "VideoScreenCapture").
-        WithProprietaryId("Your DPID", "VidCapPID").
-        WithParentalWarning("NotExplicit").
-        WithTechnicalDetails("T3", "vidCap.jpg").
-        Done()
-
-    // Add release with related resource
-    builder.AddRelease("R0", "VideoSingle").
-        WithICPN("2023121700021").
-        WithTitle("Video display title", "Video").
-        WithDisplayArtistName("John Doe").
-        WithArtist("PJohnDoe", 1).
-        WithLabel("PACME", "Worldwide").
-        WithPLine(2023, "(P) 2023 Some Pline text").
-        WithCLine(2023, "(C) 2023 Some CLine text").
-        WithDuration("PT6M36S").
-        WithGenre("Pop", "Worldwide").
-        WithParentalWarning("NoAdviceAvailable").
-        AddRelatedResource("HasContentFrom", "US1111111111").  // Related resource
-        AddResourceGroup("Component 1", 1).
-            AddContentItem(1, "A1").
-            AddLinkedResource("VideoScreenCapture", "A2").
-            Done().
-        Done()
-
-    // Add deal
-    builder.AddDeal("R0").
+        AddProprietaryId("DPID:DPID_OF_THE_SENDER", "YourProprietaryID_002").
         WithTerritory("Worldwide").
-        WithValidityPeriod("2023-12-01").
-        AddCommercialModel("SubscriptionModel").
-        AddCommercialModel("AdvertisementSupportedModel").
-        AddUseType("NonInteractiveStream").
-        AddUseType("OnDemandStream").
-        AddUseType("Stream").
+        WithParentalWarning("NotExplicit").
+        WithTechnicalImageDetails("T2", "QZ6RS1700004_01_01.jpeg", "resources/").
         Done()
+
+    // ============================================================================
+    // COLLECTION (Playlist) - Optional
+    // ============================================================================
+    builder.AddCollection("X1", "FilmBundle").
+        AddProprietaryId("YOUTUBE:PLAYLIST_ID", "PLONRDPtQh-FLMXFMM-SJHySwjpidVXmzw").
+        WithTitle("My Updated Playlist Title", "").
+        AddResourceReference("A1", 1). // Adds video at position 1 in playlist
+        Done()
+
+    // ============================================================================
+    // RELEASE 1: VideoSingle (required by spec, not used by YouTube)
+    // ============================================================================
+    builder.AddRelease("R0", "VideoSingle").
+        SetMainRelease(true).
+        WithGRid("A1UCASE0000000007X").
+        WithISRC("QZ6RS1700001").
+        WithReferenceTitle("Can you feel ...the Monkey Claw!", "Live at Budokan").
+        AddReleaseResourceReference("A1", "PrimaryResource").
+        AddReleaseResourceReference("A2", "SecondaryResource").
+        
+        // Territory-specific release details
+        WithTerritory("Worldwide").
+        WithDisplayArtistName("Monkey Claw", "").
+        WithLabel("Iron Crown Music", "").
+        
+        // Add three titles (same pattern as video)
+        WithTitle("A little bit of Foo", "").
+        WithTitleAttributes("en", "FormalTitle").
+        
+        WithTitle("A little bit of Foo", "").
+        WithTitleAttributes("en", "DisplayTitle").
+        
+        WithTitle("キャン・ユー・フィール．．．ザ・モンキー・クロー！",
+                 "ライヴ・アット・武道館").
+        WithTitleAttributes("ja", "TranslatedTitle").
+        
+        // Add DisplayArtist
+        WithDisplayArtist("Jonny and the Føøbars", "MainArtist", 1).
+        
+        // Set ParentalWarningType
+        WithParentalWarning("NotExplicit").
+        
+        // Add ResourceGroup with linked image
+        AddResourceGroup("Component 1", 1).
+        AddContentItem(1, "A1", "Video", "PrimaryResource").
+        AddLinkedResource("VideoScreenCapture", "A2").
+        Done(). // Close content item
+        Done()  // Close release
+
+    // ============================================================================
+    // RELEASE 2: VideoTrackRelease (used by YouTube for Content ID and streaming)
+    // This release contains:
+    // 1. Content ID and streaming rights (via DealList)
+    // 2. MarketingComment (becomes YouTube video description)
+    // 3. Link between Video and thumbnail Image
+    // ============================================================================
+    builder.AddRelease("R1", "VideoTrackRelease").
+        WithGRid("A1UCASE0000000007X").
+        WithISRC("QZ6RS1700001").
+        AddProprietaryId("YOUTUBE:AD_FORMAT", "AdFormatID").
+        WithReferenceTitle("Can you feel ...the Monkey Claw!", "Live at Budokan").
+        AddReleaseResourceReference("A1", "PrimaryResource").
+        AddReleaseResourceReference("A2", "SecondaryResource").
+        
+        // Territory-specific release details
+        WithTerritory("Worldwide").
+        WithDisplayArtistName("Monkey Claw", "").
+        WithLabel("Iron Crown Music", "").
+        
+        // Add three titles (same pattern)
+        WithTitle("A little bit of Foo", "").
+        WithTitleAttributes("en", "FormalTitle").
+        
+        WithTitle("A little bit of Foo", "").
+        WithTitleAttributes("en", "DisplayTitle").
+        
+        WithTitle("キャン・ユー・フィール．．．ザ・モンキー・クロー！",
+                 "ライヴ・アット・武道館").
+        WithTitleAttributes("ja", "TranslatedTitle").
+        
+        // Add DisplayArtist
+        WithDisplayArtist("Jonny and the Føøbars", "MainArtist", 1).
+        
+        // Set ParentalWarningType
+        WithParentalWarning("NotExplicit").
+        
+        // Add MarketingComment (becomes YouTube video description)
+        WithMarketingComment(`Official video for "A little bit of Foo" by Jonny and the Føøbars.
+
+Now also available on http://someothersite.abc/jonnyandthefoobars
+
+Follow us on social media: http://socialmediasite.abc/jonnyandthefoobars`).
+        
+        // Add ResourceGroup with linked thumbnail
+        AddResourceGroup("Component 1", 1).
+        AddContentItem(1, "A1", "Video", "PrimaryResource").
+        AddLinkedResource("VideoScreenCapture", "A2").
+        Done(). // Close content item
+        Done()  // Close release
+
+    // ============================================================================
+    // DEALS for Release R1 (VideoTrackRelease)
+    // Deal 1: Content ID with saved policy reference
+    // Deal 2: Streaming rights with territories and validity period
+    // ============================================================================
+    builder.AddReleaseDeal("R1").
+        // Content ID deal - references existing saved policy on YouTube
+        AddDealWithReference("YT_MATCH_POLICY:My Saved Policy").
+        
+        // Streaming deal with commercial models and territories
+        AddDeal().
+        WithCommercialModel("AdvertisementSupportedModel").
+        WithCommercialModel("SubscriptionModel").
+        WithUseType("OnDemandStream").
+        WithTerritory("US").
+        WithTerritory("CA").
+        WithValidityPeriod("2017-02-18", "2019-02-01").
+        Done(). // Close deal
+        Done()  // Close ReleaseDeal
 
     // Write to file
-    if err := builder.WriteToFile("video_single_with_related_resource.xml"); err != nil {
+    if err := builder.WriteToFile("QZ6RS1700001_music_video_content_id_combined.xml"); err != nil {
         log.Fatal(err)
     }
     
-    log.Println("Successfully created video_single_with_related_resource.xml")
+    log.Println("Successfully created DDEX ERN 3.8 XML file")
 }
 ```
 
-This example demonstrates:
-- Message header with YouTube as recipient
-- Multiple parties (artist and label)
-- Video resource with technical details and YouTube channel ID
-- Image resource for video screen capture
-- **Related resource** indicating content source (e.g., underlying music track)
-- Resource group linking video and image
-- Multi-territory deal with various commercial models
+## Key Features Explained
 
-## Building a Complete Video Release
-
-### 1. Initialize the Builder
+### 1. Dual Recipients (YouTube + Content ID)
 
 ```go
-builder := ddex.NewDDEXBuilder()
+builder.WithMessageHeader(messageId, threadId, dpid, name).
+    AddYouTubeRecipient().         // Makes video available on YouTube
+    AddYouTubeContentIDRecipient() // Enables Content ID matching
 ```
 
-### 2. Set Message Header
+### 2. Multiple Proprietary IDs
 
-```go
-builder.WithMessageHeader(
-    "MESSAGE_ID",        // Unique message identifier
-    "THREAD_ID",         // Message thread identifier
-    "YOUR_DPID",         // Your DDEX Party ID
-    "Your Company Name", // Your company name
-).AddYouTubeRecipient() // Adds YouTube as recipient
-```
-
-### 3. Add Parties
-
-Parties represent all entities involved (artists, labels, etc.):
-
-```go
-builder.AddParty("PART_REF", "Full Name", "Indexed Name")
-```
-
-Example:
-```go
-builder.AddParty("P_ARTIST", "John Doe", "Doe, John")
-builder.AddParty("P_LABEL", "ACME Records", "")
-```
-
-### 4. Add Video Resource
+YouTube supports various proprietary ID namespaces for different features:
 
 ```go
 builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
-    WithISRC("ISRC_CODE").
-    WithTitle("Video Title", "Subtitle").
-    WithDisplayArtistName("Artist Name").
-    WithArtist("PARTY_REF", "MainArtist", 1).
-    WithRightsController("LABEL_REF", 100.00).
-    WithDuration("PT3M10S").                    // ISO 8601 duration
-    WithCreationDate("2024-01-01", false).      // Date and isApproximate flag
-    WithParentalWarning("NoAdviceAvailable").
-    WithPLine(2024, "(P) 2024 Label Name").
-    WithTechnicalDetails("T1", "video.mp4").
-    AddKeywords("music video", "pop", "rock").          // Add keywords for search/display
-    AddProprietaryId("YOUTUBE:CHANNEL_ID", "UCxxxxxxx").
+    AddProprietaryId("YOUTUBE:MV_ASSET_LABEL", "my_label").      // Asset label
+    AddProprietaryId("YOUTUBE:MV_CUSTOM_ID", "custom_001").      // Custom ID
+    AddProprietaryId("YOUTUBE:CHANNEL_ID", "UCxxxxxxxx").        // Target channel
+    AddProprietaryId("YOUTUBE:AD_FORMAT", "AdFormatID").         // Ad format
     Done()
 ```
 
-#### Setting Artist Information
+### 3. Territory-Based Metadata (ERN 3.8 Structure)
 
-Artist information consists of two parts - the display name and the artist reference:
+All territory-specific data must be within `VideoDetailsByTerritory`:
 
 ```go
 builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
-    WithDisplayArtistName("Artist Name").           // How the artist name appears
-    WithArtist("PARTY_REF", "MainArtist", 1).      // Reference to party definition
-    Done()
-
-// Multiple artists with separate references
-builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
-    WithDisplayArtistName("Artist One feat. Artist Two").
-    WithArtist("PARTY_REF_1", "MainArtist", 1).
-    WithArtist("PARTY_REF_2", "FeaturedArtist", 2).
+    WithTerritory("Worldwide").  // Create territory section
+    AddTitle("My Video", "", "en", "DisplayTitle").
+    WithDisplayArtistName("Artist Name", "").
+    WithLabel("Label Name", "").
+    // ... more territory-specific fields
     Done()
 ```
 
-#### Adding Keywords
+### 4. Multiple Titles with Languages
 
-Keywords enhance user experiences by providing DSPs with information for content display and music searches:
+Support for formal, display, and translated titles:
 
 ```go
-// Add simple keywords (worldwide territory)
 builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
-    AddKeywords("music video", "pop", "rock", "ballad").
-    Done()
-
-// Add keywords with specific territory and language
-builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
-    AddKeywordsWithTerritory("US", "en", "american", "billboard").
-    AddKeywordsWithTerritory("GB", "en", "british", "uk charts").
+    WithTerritory("Worldwide").
+    AddTitle("English Title", "", "en", "FormalTitle").
+    AddTitle("English Display", "", "en", "DisplayTitle").
+    AddTitle("日本語タイトル", "サブタイトル", "ja", "TranslatedTitle").
     Done()
 ```
 
-**Important**: Each keyword must be in a separate tag. Do not combine multiple keywords in a single tag.
+### 5. Contributors and Rights
 
-#### Adding Marketing Comments
-
-Marketing comments provide information about the promotion and marketing of releases:
+Add various contributors without needing PartyList in ERN 3.8:
 
 ```go
-// Add simple marketing comment (worldwide territory)
-release := builder.AddRelease("R1", "Single").
-    WithTitle("My Song", "").
-    WithMarketingCommentSimple("A powerful ballad about love and loss").
-    Done()
-
-// Add detailed marketing comment with territory and language
-release := builder.AddRelease("R1", "Album").
-    WithTitle("My Album", "").
-    WithMarketingComment("This compelling album explores themes of human connection through ten original compositions, blending elements of pop, rock, and soul.", "Worldwide", "en").
-    WithMarketingComment("Un album fascinant qui explore les thèmes de la connexion humaine.", "FR", "fr").
+builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
+    WithTerritory("Worldwide").
+    AddDisplayArtist("Artist Name", "MainArtist", 1).
+    AddContributor("Producer Name", []string{"Producer"}, 1).
+    AddIndirectContributor("Composer Name", []string{"Composer"}, 1).
+    AddRightsController("Label Name", "DPID", "RightsController", 100.00).
     Done()
 ```
+
+### 6. Two Release Structure (Video Single Profile)
+
+YouTube DDEX feeds require two releases:
+
+1. **VideoSingle** - Contains the complete metadata but not used by YouTube
+2. **VideoTrackRelease** - Used for Content ID, streaming rights, and video description
+
+```go
+// Release 1: VideoSingle (required by spec)
+builder.AddRelease("R0", "VideoSingle").
+    SetMainRelease(true).
+    // ... metadata
+    Done()
+
+// Release 2: VideoTrackRelease (used by YouTube)
+builder.AddRelease("R1", "VideoTrackRelease").
+    AddMarketingComment("Video description text").
+    // ... metadata
+    Done()
+```
+
+### 7. Deal Structure (Content ID + Streaming)
+
+Separate deals for Content ID matching and streaming rights:
+
+```go
+// Content ID deal with saved policy reference
+builder.AddReleaseDeal("R1").
+    AddDealWithReference("YT_MATCH_POLICY:My Saved Policy").
+    Done()
+
+// Streaming deal with territories and validity period
+builder.AddReleaseDeal("R1").
+    AddDeal().
+    WithCommercialModel("AdvertisementSupportedModel").
+    WithCommercialModel("SubscriptionModel").
+    WithUseType("OnDemandStream").
+    WithTerritory("US").
+    WithTerritory("CA").
+    WithValidityPeriod("2017-02-18", "2019-02-01").
+    Done().
+    Done()
+```
+
+### 8. Collections (Playlists)
+
+Add videos to existing playlists:
+
+```go
+builder.AddCollection("X1", "FilmBundle").
+    AddProprietaryId("YOUTUBE:PLAYLIST_ID", "PLxxxxxxxxxx").
+    WithTitle("Playlist Title", "").
+    AddResourceReference("A1", 1).  // Position in playlist
+    Done()
+```
+
+### 9. Marketing Comments
+
+The marketing comment becomes the YouTube video description:
+
+```go
+builder.AddRelease("R1", "VideoTrackRelease").
+    WithTerritory("Worldwide").
+    AddMarketingComment(`Official video for "Song Title" by Artist Name.
+
+Available on streaming: http://example.com
+Follow us: http://social.example.com`).
+    Done()
+```
+
+### 10. Technical Details with File Paths
+
+Include file paths when delivering actual media files:
+
+```go
+builder.AddVideo("A1", "ShortFormMusicalWorkVideo").
+    WithTerritory("Worldwide").
+    WithTechnicalDetails("T1", "video.mpeg", "resources/").
+    Done()
+
+builder.AddImage("A2", "VideoScreenCapture").
+    WithTerritory("Worldwide").
+    WithTechnicalDetails("T2", "thumbnail.jpeg", "resources/").
+    Done()
+```
+
+## API Reference
+
+### Builder Methods
+
+#### Message Header
+- `WithMessageHeader(messageId, threadId, dpid, name)` - Set message header
+- `AddYouTubeRecipient()` - Add YouTube as recipient
+- `AddYouTubeContentIDRecipient()` - Add YouTube Content ID as recipient
+- `AddRecipient(partyId, partyName)` - Add custom recipient
+
+#### Video Resource
+- `AddVideo(resourceRef, videoType)` - Create video resource
+- `WithISRC(isrc)` - Set ISRC
+- `AddProprietaryId(namespace, value)` - Add proprietary identifier
+- `WithIndirectVideoId(iswc)` - Add musical work reference
+- `WithReferenceTitle(title, subtitle)` - Set reference title (video-level)
+- `WithLanguageOfPerformance(language)` - Set language
+- `WithDuration(duration)` - Set duration (ISO 8601 format)
+- `WithTerritory(territoryCode)` - Create/switch territory section
+- `AddTitle(title, subtitle, language, titleType)` - Add title in territory
+- `WithDisplayArtistName(name, language)` - Set display artist name
+- `AddDisplayArtist(name, role, sequence)` - Add display artist
+- `AddContributor(name, roles, sequence)` - Add contributor
+- `AddIndirectContributor(name, roles, sequence)` - Add indirect contributor
+- `WithLabel(name, language)` - Set label name
+- `AddRightsController(name, partyId, role, percentage)` - Add rights controller
+- `WithResourceReleaseDate(date)` - Set resource release date
+- `WithPLine(year, text)` - Set P-line
+- `WithGenre(genre, subGenre)` - Set genre
+- `WithParentalWarning(warningType)` - Set parental warning
+- `AddKeywords(keywords...)` - Add keywords
+- `WithTechnicalDetails(techRef, fileName, filePath)` - Add technical details
+
+#### Image Resource
+- `AddImage(resourceRef, imageType)` - Create image resource
+- `AddProprietaryId(namespace, value)` - Add proprietary identifier
+- `WithTerritory(territoryCode)` - Create/switch territory section
+- `WithParentalWarning(warningType)` - Set parental warning
+- `WithTechnicalDetails(techRef, fileName, filePath)` - Add technical details
+- `WithCreationDate(date, isApproximate)` - Set creation date
+
+#### Collection (Playlist)
+- `AddCollection(collectionRef, collectionType)` - Create collection
+- `AddProprietaryId(namespace, value)` - Add proprietary identifier
+- `WithTitle(title, subtitle)` - Set collection title
+- `AddResourceReference(resourceRef, sequence)` - Add resource to collection
+
+#### Release
+- `AddRelease(releaseRef, releaseType)` - Create release
+- `SetMainRelease(isMain)` - Mark as main release
+- `WithGRid(grid)` - Set GRid
+- `WithISRC(isrc)` - Set ISRC
+- `AddProprietaryId(namespace, value)` - Add proprietary identifier
+- `WithReferenceTitle(title, subtitle)` - Set reference title
+- `AddReleaseResourceReference(resourceRef, resourceType)` - Link resource
+- `WithTerritory(territoryCode)` - Create/switch territory section
+- `WithDisplayArtistName(name, language)` - Set display artist name
+- `WithLabel(name, language)` - Set label
+- `AddTitle(title, subtitle, language, titleType)` - Add title
+- `AddDisplayArtist(name, role, sequence)` - Add display artist
+- `WithParentalWarning(warningType)` - Set parental warning
+- `AddMarketingComment(text)` - Add marketing comment
+- `AddResourceGroup(title, sequence)` - Add resource group
+- `AddContentItem(sequence, resourceRef, resourceType, releaseResourceType)` - Add content item
+- `AddLinkedResource(linkDescription, resourceRef)` - Link related resource
+
+#### Deal
+- `AddReleaseDeal(releaseRef)` - Create deal for release
+- `AddDealWithReference(dealReference)` - Add deal with policy reference
+- `AddDeal()` - Create new deal with terms
+- `WithCommercialModel(model)` - Add commercial model
+- `WithUseType(useType)` - Set use type
+- `WithTerritory(territoryCode)` - Add territory
+- `WithValidityPeriod(startDate, endDate)` - Set validity period
+
+#### Output
+- `WriteToFile(filename)` - Write XML to file
+- `ToXML()` - Get XML as string
+
+## ERN 3.8 vs ERN 4.x Differences
+
+This package implements ERN 3.8, which has important differences from ERN 4.x:
+
+1. **No PartyList** - Party information is inline within resources and releases
+2. **Territory-based structure** - VideoDetailsByTerritory and ReleaseDetailsByTerritory are mandatory
+3. **Namespace** - Uses `http://ddex.net/xml/ern/381` or `/382`
+4. **Simpler types** - Many types are simplified without territory attributes at top level
+
+## YouTube-Specific Guidelines
+
+### Message Recipients
+- Include "YouTube" (`PADPIDA2013020802I`) to make video available on YouTube
+- Include "YouTube_ContentID" (`PADPIDA2015120100H`) to enable Content ID matching
+
+### Proprietary ID Namespaces
+- `YOUTUBE:MV_ASSET_LABEL` - Asset label (can be repeated)
+- `YOUTUBE:MV_CUSTOM_ID` - Custom ID for Music Video asset
+- `YOUTUBE:CHANNEL_ID` - Target channel for upload
+- `YOUTUBE:AD_FORMAT` - Ad format configuration
+- `YOUTUBE:PLAYLIST_ID` - Playlist identifier for collections
+- `DPID:YOUR_DPID` - Your proprietary ID (used as custom ID if no MV_CUSTOM_ID)
+
+### Deal References
+- `YT_MATCH_POLICY:PolicyName` - Reference to saved Content ID match policy
+- `YT_USAGE_POLICY:PolicyName` - Reference to saved usage policy
+
+### Release Types
+- `VideoSingle` - Required by spec but not used by YouTube
+- `VideoTrackRelease` - Used for Content ID, streaming rights, and video metadata
+
+### Marketing Comments
+- Marketing comments in VideoTrackRelease become the YouTube video description
+- Supports multiline text with URLs
+
+## License
+
+MIT
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Support
+
+For issues and questions, please open an issue on GitHub.
 
 **Benefits**: 
 - Provides marketing context for releases
@@ -656,15 +907,19 @@ dateTime := ddex.FormatDateTime(time.Now())       // Returns "2024-11-08T15:30:4
 
 See the `examples/` directory for complete working examples:
 
-- `create_video_single.go` - Complete video single release
-- `create_video_album.go` - Multi-video release
-- `parse_example.go` - Parsing existing DDEX files
+- `create_video_single.go` - Complete video single release for ERN 3.8
 
 ## DDEX Resources
 
 - [DDEX Official Site](https://ddex.net/)
-- [ERN 4.3 Specification](https://ddex.net/standards/ern/43/)
+- [ERN 3.8 Data Dictionary](https://service.ddex.net/dd/ERN38/)
 - [YouTube DDEX Guide](https://support.google.com/youtube/answer/7127884)
+- [YouTube DDEX Reference Resources](https://support.google.com/youtube/answer/3506749)
+- [DDEX ERN Knowledge Base](https://kb.ddex.net/implementing-each-standard/electronic-release-notification-message-suite-(ern)/)
+
+## Migration from ERN 4.3
+
+If you're migrating from the previous ERN 4.3 version of this package, see [MIGRATION_TO_ERN38.md](MIGRATION_TO_ERN38.md) for a detailed guide on the changes.
 
 ## License
 
@@ -678,4 +933,5 @@ Contributions welcome! Please open an issue or submit a pull request.
 
 For issues and questions:
 - GitHub Issues: [your-repo-url]
+
 - DDEX Knowledge Base: https://kb.ddex.net/
