@@ -366,6 +366,15 @@ func (vtb *VideoDetailsByTerritoryBuilder) WithGenre(genreText string) *VideoDet
 	return vtb
 }
 
+// WithGenreAndSubGenre adds genre information with a subgenre for the current territory
+func (vtb *VideoDetailsByTerritoryBuilder) WithGenreAndSubGenre(genreText, subGenre string) *VideoDetailsByTerritoryBuilder {
+	vtb.territoryDetails.Genre = append(vtb.territoryDetails.Genre, Genre{
+		GenreText: genreText,
+		SubGenre:  subGenre,
+	})
+	return vtb
+}
+
 // WithTechnicalDetails adds technical details and file URI for ERN 3.8 (territory specific)
 func (vtb *VideoDetailsByTerritoryBuilder) WithTechnicalDetails(techRef, fileURI string) *VideoDetailsByTerritoryBuilder {
 	vtb.territoryDetails.TechnicalVideoDetails = append(vtb.territoryDetails.TechnicalVideoDetails, TechnicalVideoDetails{
