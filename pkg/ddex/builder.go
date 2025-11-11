@@ -375,12 +375,12 @@ func (vtb *VideoDetailsByTerritoryBuilder) WithGenreAndSubGenre(genreText, subGe
 	return vtb
 }
 
-// WithTechnicalDetails adds technical details and file URI for ERN 3.8 (territory specific)
-func (vtb *VideoDetailsByTerritoryBuilder) WithTechnicalDetails(techRef, fileURI string) *VideoDetailsByTerritoryBuilder {
+// WithTechnicalDetails adds technical details and file FileName for ERN 3.8 (territory specific)
+func (vtb *VideoDetailsByTerritoryBuilder) WithTechnicalDetails(techRef, fileName string) *VideoDetailsByTerritoryBuilder {
 	vtb.territoryDetails.TechnicalVideoDetails = append(vtb.territoryDetails.TechnicalVideoDetails, TechnicalVideoDetails{
 		TechnicalResourceDetailsReference: techRef,
 		File: &File{
-			URI: fileURI,
+			FileName: fileName,
 		},
 	})
 	return vtb
@@ -502,12 +502,12 @@ func (itb *ImageDetailsByTerritoryBuilder) WithCLine(year int, text string) *Ima
 // Note: RightsController is not part of ImageDetailsByTerritory in ERN 3.8
 // Rights information for images should be managed at the Image resource level, not territory level
 
-// WithTechnicalDetails adds technical details and file URI for images (ERN 3.8 - territory specific)
-func (itb *ImageDetailsByTerritoryBuilder) WithTechnicalDetails(techRef, fileURI string) *ImageDetailsByTerritoryBuilder {
+// WithTechnicalDetails adds technical details and file FileName for images (ERN 3.8 - territory specific)
+func (itb *ImageDetailsByTerritoryBuilder) WithTechnicalDetails(techRef, fileName string) *ImageDetailsByTerritoryBuilder {
 	itb.territoryDetails.TechnicalImageDetails = append(itb.territoryDetails.TechnicalImageDetails, TechnicalImageDetails{
 		TechnicalResourceDetailsReference: techRef,
 		File: &File{
-			URI: fileURI,
+			FileName: fileName,
 		},
 	})
 	return itb

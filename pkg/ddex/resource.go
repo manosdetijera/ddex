@@ -290,7 +290,7 @@ type ImageDetailsByTerritory struct {
 
 // ImageId represents image identification
 type ImageId struct {
-	XMLName       xml.Name        `xml:"ResourceId"`
+	XMLName       xml.Name        `xml:"ImageId"`
 	ProprietaryId []ProprietaryId `xml:"ProprietaryId,omitempty"`
 }
 
@@ -365,7 +365,7 @@ type TechnicalImageDetails struct {
 
 type File struct {
 	XMLName  xml.Name `xml:"File"`
-	URI      string   `xml:"URI,omitempty"`
+	FileName string   `xml:"FileName,omitempty"`
 	HashSum  *HashSum `xml:"HashSum,omitempty"`
 	FileSize int      `xml:"FileSize,omitempty"`
 }
