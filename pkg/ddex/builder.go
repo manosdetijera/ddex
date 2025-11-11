@@ -579,9 +579,9 @@ func (rtb *ReleaseDetailsByTerritoryBuilder) WithDisplayArtistName(artistName, l
 	if languageCode == "" {
 		languageCode = "en"
 	}
-	rtb.territoryDetails.DisplayArtistName = append(rtb.territoryDetails.DisplayArtistName, Name{
-		FullName:     artistName,
-		LanguageCode: languageCode,
+	rtb.territoryDetails.DisplayArtistName = append(rtb.territoryDetails.DisplayArtistName, DisplayArtistName{
+		Value:                 artistName,
+		LanguageAndScriptCode: languageCode,
 	})
 	return rtb
 }
@@ -607,6 +607,28 @@ func (rtb *ReleaseDetailsByTerritoryBuilder) WithLabel(labelName, languageCode s
 		Value:                 labelName,
 		LanguageAndScriptCode: languageCode,
 	})
+	return rtb
+}
+
+// AddTitle adds a title to the current territory
+func (rtb *ReleaseDetailsByTerritoryBuilder) AddTitle(titleText, subtitle, languageCode, titleType string) *ReleaseDetailsByTerritoryBuilder {
+	title := Title{
+		TitleText: titleText,
+	}
+
+	if subtitle != "" {
+		title.SubTitle = subtitle
+	}
+
+	if languageCode != "" {
+		title.LanguageAndScriptCode = languageCode
+	}
+
+	if titleType != "" {
+		title.TitleType = titleType
+	}
+
+	rtb.territoryDetails.Title = append(rtb.territoryDetails.Title, title)
 	return rtb
 }
 

@@ -79,7 +79,7 @@ type ReleaseDetailsByTerritory struct {
 	LanguageAndScriptCode       string                        `xml:"LanguageAndScriptCode,attr,omitempty"`
 	TerritoryCode               []string                      `xml:"TerritoryCode,omitempty"`
 	ExcludedTerritoryCode       []string                      `xml:"ExcludedTerritoryCode,omitempty"`
-	DisplayArtistName           []Name                        `xml:"DisplayArtistName,omitempty"`
+	DisplayArtistName           []DisplayArtistName           `xml:"DisplayArtistName,omitempty"`
 	LabelName                   []LabelName                   `xml:"LabelName,omitempty"`
 	Title                       []Title                       `xml:"Title,omitempty"`
 	DisplayArtist               []DisplayArtist               `xml:"DisplayArtist,omitempty"`
@@ -110,10 +110,11 @@ type LabelName struct {
 
 // Title represents a title (different from DisplayTitle)
 type Title struct {
-	XMLName   xml.Name `xml:"Title"`
-	TitleType string   `xml:"TitleType,attr,omitempty"`
-	TitleText string   `xml:"TitleText"`
-	SubTitle  string   `xml:"SubTitle,omitempty"`
+	XMLName               xml.Name `xml:"Title"`
+	LanguageAndScriptCode string   `xml:"LanguageAndScriptCode,attr,omitempty"`
+	TitleType             string   `xml:"TitleType,attr,omitempty"`
+	TitleText             string   `xml:"TitleText"`
+	SubTitle              string   `xml:"SubTitle,omitempty"`
 }
 
 // AdministratingRecordCompany represents the administrating record company
