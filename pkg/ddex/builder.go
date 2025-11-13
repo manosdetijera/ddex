@@ -301,6 +301,22 @@ func (vtb *VideoDetailsByTerritoryBuilder) WithResourceContributor(partyName str
 	return vtb
 }
 
+// WithIndirectResourceContributor adds an indirect contributor to the video resource (territory specific)
+// role can be multiple values like "Composer", "Lyricist", etc.
+func (vtb *VideoDetailsByTerritoryBuilder) WithIndirectResourceContributor(partyName string, roles []string, sequence int) *VideoDetailsByTerritoryBuilder {
+	if partyName != "" && len(roles) > 0 {
+		vtb.territoryDetails.IndirectResourceContributor = append(vtb.territoryDetails.IndirectResourceContributor, IndirectResourceContributor{
+			SequenceNumber: sequence,
+			PartyName: []PartyName{
+				{FullName: partyName},
+			},
+			IndirectResourceContributorRole: roles,
+		})
+	}
+
+	return vtb
+}
+
 // WithRightsController sets the rights controller (territory specific)
 // Parameters: partyName, partyId, and percentage
 func (vtb *VideoDetailsByTerritoryBuilder) WithRightsController(partyName, partyId string, percentage float64) *VideoDetailsByTerritoryBuilder {
