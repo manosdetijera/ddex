@@ -999,6 +999,17 @@ func (db *DealBuilder) WithValidityPeriodEndDate(endDate string) *DealBuilder {
 	return db
 }
 
+// WithEmptyValidityPeriod adds an empty ValidityPeriod tag to the deal
+func (db *DealBuilder) WithEmptyValidityPeriod() *DealBuilder {
+	if db.deal.DealTerms == nil {
+		db.deal.DealTerms = &DealTerms{}
+	}
+
+	db.deal.DealTerms.ValidityPeriod = append(db.deal.DealTerms.ValidityPeriod, ValidityPeriod{})
+
+	return db
+}
+
 // WithValidityPeriodDateTime sets the deal validity period with a start date-time (YYYY-MM-DDTHH:MM:SS)
 func (db *DealBuilder) WithValidityPeriodDateTime(startDateTime string) *DealBuilder {
 	if db.deal.DealTerms == nil {
