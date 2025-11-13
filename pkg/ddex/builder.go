@@ -849,8 +849,8 @@ func (rb *ReleaseBuilder) AddReleaseResourceReference(resourceRef, releaseResour
 // AddRelatedRelease adds a related release for the current territory
 func (rtb *ReleaseDetailsByTerritoryBuilder) AddRelatedRelease(relationshipType string, releaseId ReleaseId) *ReleaseDetailsByTerritoryBuilder {
 	rtb.territoryDetails.RelatedRelease = append(rtb.territoryDetails.RelatedRelease, RelatedRelease{
-		ReleaseRelationshipType: relationshipType,
 		ReleaseId:               releaseId,
+		ReleaseRelationshipType: relationshipType,
 	})
 	return rtb
 }

@@ -141,8 +141,8 @@ type Comment struct {
 // RelatedRelease represents a related release
 type RelatedRelease struct {
 	XMLName                 xml.Name  `xml:"RelatedRelease"`
-	ReleaseRelationshipType string    `xml:"ReleaseRelationshipType"`
 	ReleaseId               ReleaseId `xml:"ReleaseId"`
+	ReleaseRelationshipType string    `xml:"ReleaseRelationshipType"`
 }
 
 // ReleaseId represents release identification (ICPN, GRid, ISRC, etc.) for ERN 3.8
