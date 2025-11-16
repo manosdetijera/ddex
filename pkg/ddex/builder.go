@@ -1059,6 +1059,15 @@ func (db *DealBuilder) WithRightsClaimPolicy(policyType string) *DealBuilder {
 	return db
 }
 
+// IsTakedown sets whether the deal is a takedown (can be called multiple times)
+func (db *DealBuilder) IsTakedown(takedown bool) *DealBuilder {
+	if db.deal.DealTerms == nil {
+		db.deal.DealTerms = &DealTerms{}
+	}
+	db.deal.DealTerms.TakeDown = &takedown
+	return db
+}
+
 // Done returns to the release deal builder
 func (db *DealBuilder) Done() *ReleaseDealBuilder {
 	return db.releaseDealBuilder
